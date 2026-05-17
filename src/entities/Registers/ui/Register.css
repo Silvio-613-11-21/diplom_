@@ -1,0 +1,7 @@
+.RegisterTable{
+    font-size: x-large;
+}
+
+.RegisterTable td {
+    width: 40px;
+}

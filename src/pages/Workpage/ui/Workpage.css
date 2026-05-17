@@ -1,0 +1,23 @@
+#workspace {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    height: 100%;
+    width: 100%;
+
+    padding: 20px;
+}
+
+#editorspace {
+    height: 100%;
+    width: 100%;
+}
+#debuggerspace {
+    height: 100%;
+    width: 100%;
+}
+
