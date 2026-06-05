@@ -19,7 +19,7 @@ export class Registers extends RegistersState {
     }
     
 
-    public override setValue(name: string, value:number) : boolean {
+    public override setValue(name: string, value:string) : boolean {
         let reg = document.getElementById(`${name}`) as HTMLElement;
         reg.textContent =  `${value}`; 
         
@@ -28,7 +28,7 @@ export class Registers extends RegistersState {
 
     public override resetAll(): void {
         this.RegistersNameList.forEach(name => {
-            (document.getElementById(name) as HTMLElement).textContent = "0"; 
+            (document.getElementById(name) as HTMLElement).textContent = "0000"; 
         })
 
         return super.resetAll();  

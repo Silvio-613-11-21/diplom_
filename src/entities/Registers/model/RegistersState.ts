@@ -1,21 +1,17 @@
-interface Register {
-    name: string;
-    value: number;
-}
 
 
 export class RegistersState {
     protected RegistersNameList: string[] = [
-        "AX", "BX", "CX", "DX",
-        "SI", "DI", "BP", "SP",
-        "CS", "DS", "ES", "SS"
+        "ax", "bx", "cx", "dx",
+        "si", "di", "bp", "sp",
+        "cs", "ds", "es", "ss"
     ];
 
-    private registers: Map<string, number> = new Map();
+    private registers: Map<string, string> = new Map();
 
     constructor() {
         this.RegistersNameList.forEach(name => {
-            this.registers.set(name, 0);
+            this.registers.set(name, "0000");
         })
     }
 
@@ -30,7 +26,7 @@ export class RegistersState {
         }));
     }
 
-    protected setValue(name: string, value: number) {
+    protected setValue(name: string, value: string) {
         if (this.registers.has(name)) {
             this.registers.set(name, value);
             return true;
@@ -40,7 +36,7 @@ export class RegistersState {
 
     protected resetAll() {
         for (const name of this.RegistersNameList) {
-            this.registers.set(name, 0);
+            this.registers.set(name, "0000");
         }
     }
 }

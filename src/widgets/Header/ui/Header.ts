@@ -30,7 +30,7 @@ export class Header {
     }
 
     private init = () => {
-        this.app.insertAdjacentHTML('beforeend', this.header); 
+        this.app.insertAdjacentHTML('beforebegin', this.header); 
 
         let logo = document.getElementById("logo") as HTMLImageElement; 
         logo.src = img; 

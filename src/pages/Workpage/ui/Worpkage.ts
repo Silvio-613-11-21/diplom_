@@ -1,22 +1,23 @@
 import './Workpage.css'
 import { Editor } from "src/widgets/Editor";
-import workspace from './Workpage.html?raw'
+import workspace_html from './Workpage.html?raw'
 
 import { Debugger } from 'src/widgets/Debugger';
 import { ControlPanel } from 'src/widgets/ControlPanel';
 
 export function Workpage(App: HTMLElement) {
-    new ControlPanel(App);
+    
 
-    App.insertAdjacentHTML('beforeend', workspace);
+    App.insertAdjacentHTML('beforeend', workspace_html);
 
     const editorspace = document.getElementById("editorspace") as HTMLElement; 
     const debuggerspace = document.getElementById("debuggerspace") as HTMLElement; 
 
    
 
-    new Editor(editorspace);
-    new Debugger(debuggerspace);
+    const editor = new Editor(editorspace);
+    const debugger_ = new Debugger(debuggerspace);
 
-
+     
+    new ControlPanel(App, editor, debugger_);
 }

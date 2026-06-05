@@ -24,13 +24,14 @@
     column-gap: 5px;
 }
 
-
-
-
 .first-header div img {
     max-height: 5vh;
 }
 
 .first-header  button {
     background-color: white;
+}
+
+.restrict-info{
+    background-color: red;
 }
