@@ -6,11 +6,13 @@ import { SimpleInstruction } from "src/shared/types/SimpleInstruction";
 import { Editor } from 'src/widgets/Editor';
 import { Debugger } from 'src/widgets/Debugger';
 
-export function emulator(editor: Editor, debugger_: Debugger) {
+import { Restricts  } from "src/shared/types/Restricts";
+
+export function emulator(editor: Editor, debugger_: Debugger, restricts: Restricts) {
 
     debugger_.reg.resetAll();
     //console.log(editor.content)
-    const instrs = parser(editor.content, ["mov", "shl"], ["ax", "bx"])
+    const instrs = parser(editor.content, restricts.cmd, restricts.rl)
     if (!instrs) return;
     //console.log(instrs)
 

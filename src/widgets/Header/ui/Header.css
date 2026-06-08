@@ -11,6 +11,8 @@
     border-bottom: 1px solid;
 
     width: 100%;
+
+    background-color: var(--greyCol);
 }
 
 .first-header div span {
@@ -30,8 +32,4 @@
 
 .first-header  button {
     background-color: white;
-}
-
-.restrict-info{
-    background-color: red;
 }

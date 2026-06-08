@@ -1,21 +1,18 @@
-import RegisterTab from './Register.html?raw';
+import html from './Register.html?raw';
 import './Register.css'
 
 import { RegistersState } from '../model/RegistersState';
 
 export class Registers extends RegistersState {
-    private debugger_: HTMLElement;
-    private RegisterTab: string = RegisterTab;
-
+   
     constructor(debugger_: HTMLElement) {
         super(); 
 
-        this.debugger_ = debugger_;
-        this.init();
+        this.init(debugger_);
     }
 
-    private init() {
-        this.debugger_.insertAdjacentHTML('beforeend', this.RegisterTab)
+    private init(debugger_: HTMLElement) {
+        debugger_.insertAdjacentHTML('beforeend', html)
     }
     
 

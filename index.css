@@ -1,6 +1,12 @@
+:root{
+    --themeCol: white;
+    --greyCol: #edf1f8;
+    --greyHover: #c8c8c8;
+}
+
+
 * {
     padding: 0;
-    border: 0;
     margin: 0;
 
     box-sizing: border-box;
@@ -32,4 +38,10 @@ td {
 
 button{
     cursor: pointer;
+    background-color: var(--greyCol);
+    border: none;
+}
+
+button:hover{
+    background-color: var(--greyHover);
 }

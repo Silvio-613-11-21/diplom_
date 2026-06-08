@@ -1,9 +1,39 @@
-.second-header{
-    width: 100%;
-    padding-top: 20px;
-    padding-left: 20px;
+.control-panel {
+    --bordRad: 6px;
+    --bordSize: 1px;
+
+    display: inline-block;
+    border: var(--bordSize) solid;
+    border-radius: var(--bordRad);
 }
 
-.second-header > button {
+.control-panel-block {
+    display: flex;
+    height: 100%;
+
+}
+
+.control-panel-block>button {
+    font-size: medium;
+
+    border-right: var(--bordSize) solid;
+    padding: 4px;
+
+}
+
+.control-panel-block>button:first-child {
+    border-top-left-radius: var(--bordRad);
+    border-bottom-left-radius: var(--bordRad);
+}
+
+.control-panel-block>button:last-child {
+    border: none;
+
+    border-top-right-radius: var(--bordRad);
+    border-bottom-right-radius: var(--bordRad);
+}
+
+.run-all {
     background-color: chartreuse;
+
 }

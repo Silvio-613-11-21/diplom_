@@ -1,12 +1,8 @@
-interface Restricts {
-    cmd: string[];
-    rl: string[];
-}
+import { Restricts } from "../types/Restricts"
 
-
-export function getRestrists(lab: number, z: number) {
+export function getRestrists(lab: number, z: number): Restricts | undefined | null {
     const labs = [lab1]
-    return labs[lab](z)
+    return labs[lab - 1 ](z)
 }
 
 function lab1(z: number): Restricts | null {
@@ -16,7 +12,7 @@ function lab1(z: number): Restricts | null {
         }
 
         case 2: {
-            return { cmd: ["add", "sub", ...(lab1(z - 1)?.cmd ?? [])], rl: ["cx"] }
+            return { cmd: ["add", "sub", ...(lab1(z - 1)?.cmd ?? [])], rl: ["cx", "dx"] }
         }
         case 3: {
             return { cmd: ["mov", "and"], rl: ["ax"] }
