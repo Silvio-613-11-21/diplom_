@@ -9,8 +9,16 @@ import { FlagRegisters } from 'src/entities/FlagRegister';
 export class Debugger {
     public debState: "deb" | "cons" = "deb"
     public reg!: Registers
-    public flagReg!: FlagRegisters; 
+    public flagReg!: FlagRegisters;
 
+    // =======================================
+
+    private debSwBtn!: HTMLButtonElement;
+    private consSwBtn!: HTMLButtonElement;
+    private debContent!: HTMLElement;
+    private consContent!: HTMLElement;
+
+    //===========================
 
     constructor(App: HTMLElement) {
         this.init(App)
@@ -21,41 +29,40 @@ export class Debugger {
         App.insertAdjacentHTML('beforeend', html);
 
         const registersSpace = document.querySelector(".registers-space") as HTMLElement;
-        const flagRegistersSpace = document.querySelector(".flag-registers-space") as HTMLElement; 
-        
+        const flagRegistersSpace = document.querySelector(".flag-registers-space") as HTMLElement;
+
         this.reg = new Registers(registersSpace);
-        this.flagReg = new FlagRegisters(flagRegistersSpace); 
+        this.flagReg = new FlagRegisters(flagRegistersSpace);
 
-        const debSwBtn = document.querySelector(".debbuder-switch-btn") as HTMLButtonElement;
-        const consSwBtn = document.querySelector(".console-switch-btn") as HTMLButtonElement;
-        const debContent = document.querySelector(".debbuger-content") as HTMLElement;
-        const consContent = document.querySelector(".console-content")  as HTMLElement; 
-         
-        this.btnSwitcher(debSwBtn, consSwBtn, debContent, consContent);
+        this.debSwBtn = document.querySelector(".debbuder-switch-btn") as HTMLButtonElement;
+        this.consSwBtn = document.querySelector(".console-switch-btn") as HTMLButtonElement;
+        this.debContent = document.querySelector(".debbuger-content") as HTMLElement;
+        this.consContent = document.querySelector(".console-content") as HTMLElement;
 
-        debSwBtn.addEventListener('click', () => {
+        this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent);
+
+        this.debSwBtn.addEventListener('click', () => {
             this.debState = 'deb';
-            this.btnSwitcher(debSwBtn, consSwBtn, debContent, consContent);
+            this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent);
         })
 
-        consSwBtn.addEventListener('click', () => {
+        this.consSwBtn.addEventListener('click', () => {
             this.debState = 'cons';
-            this.btnSwitcher(debSwBtn, consSwBtn, debContent, consContent);
+            this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent);
         })
 
 
-        
     }
 
-    private btnSwitcher(debSwBtn: HTMLButtonElement, 
-        consSwBtn: HTMLButtonElement, 
-        debContent: HTMLElement, 
+    private btnSwitcher(debSwBtn: HTMLButtonElement,
+        consSwBtn: HTMLButtonElement,
+        debContent: HTMLElement,
         consContent: HTMLElement) {
         switch (this.debState) {
             case "deb": {
                 debSwBtn.classList.add("isActive");
                 consSwBtn.classList.remove("isActive");
-                debContent.hidden = false; 
+                debContent.hidden = false;
                 consContent.hidden = true;
                 break;
             }
@@ -63,11 +70,23 @@ export class Debugger {
                 consSwBtn.classList.add("isActive");
                 debSwBtn.classList.remove("isActive");
                 consContent.hidden = false;
-                debContent.hidden = true; 
+                debContent.hidden = true;
                 break;
             }
         }
     }
 
+    //===================================================================
+    public consolePrint(message: string) {
+        this.debState = 'cons';
+        this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent); 
+        this.consContent.textContent = ''; 
+        this.consContent.textContent = message; 
+    }
+
+    public debbCall(){
+        this.debState = 'deb'; 
+        this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent); 
+    }
 }
 

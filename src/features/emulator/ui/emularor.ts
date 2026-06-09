@@ -1,4 +1,4 @@
-import { parser } from "../model/parser/parser";
+import { parser } from "../../parser/model/parser";
 import { Commands as cmd } from "../model/commands/commands";
 
 import { SimpleInstruction } from "src/shared/types/SimpleInstruction";
@@ -6,20 +6,19 @@ import { SimpleInstruction } from "src/shared/types/SimpleInstruction";
 import { Editor } from 'src/widgets/Editor';
 import { Debugger } from 'src/widgets/Debugger';
 
-import { Restricts  } from "src/shared/types/Restricts";
+import { Restricts } from "src/shared/types/Restricts";
 
-export function emulator(editor: Editor, debugger_: Debugger, restricts: Restricts) {
+export function emulator(instrs: SimpleInstruction[],  editor: Editor, debugger_: Debugger,) {
 
     debugger_.reg.resetAll();
     //console.log(editor.content)
-    const instrs = parser(editor.content, restricts.cmd, restricts.rl)
-    if (!instrs) return;
+    // const instrs: SimpleInstruction[] | string = parser(editor.content, restricts.cmd, restricts.rl)
+    // if (typeof instrs === 'string') return;
     //console.log(instrs)
 
 
     for (const instr of instrs) {
-        if (typeof instr !== 'string')
-            cmdSwitcher(instr, debugger_);
+        cmdSwitcher(instr, debugger_);
     }
 
 }
