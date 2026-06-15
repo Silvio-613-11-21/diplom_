@@ -37,15 +37,103 @@ export class Reader {
         return val;
     }
 
-    static checkValue(val: string, registersNameList: string[]): ResgisterValue {
-        
-        const lastChar = val.slice(-1);
-        //console.log(lastChar)
-        switch (lastChar) {
-            case "b": {
-                const binVal = val.slice(0, -1);
+    static checkValue(val: string, currentCmd: string, registersNameList: string[]): ResgisterValue {
 
-                if (binVal.length > 16) {
+        if (currentCmd === "shl" || currentCmd === "shr") {
+            if (RegExp.isDecimalString(val)) {
+                return {
+                    state: true,
+                    system: "d",
+                    value: val
+                }
+            }
+        }
+        else {
+            const lastChar = val.slice(-1);
+            //console.log(lastChar)
+            switch (lastChar) {
+                case "b": {
+                    const binVal = val.slice(0, -1);
+
+                    if (binVal.length > 16) {
+                        return {
+                            state: false,
+                            system: "none",
+                            value: mess.messages_ru[5]
+                        }
+                    }
+
+                    if (RegExp.isBinaryString(binVal)) {
+                        return {
+                            state: true,
+                            system: "b",
+                            value: binVal
+                        }
+                    }
+                    else {
+                        return {
+                            state: false,
+                            system: "none",
+                            value: mess.messages_ru[6]
+                        }
+                    }
+                    break;
+                }
+                case "h": {
+                    let hexVal = val.slice(0, -1);
+
+                    console.log(hexVal)
+                    if (hexVal.slice(0, 1) !== "0") {
+                        return {
+                            state: false,
+                            system: "none",
+                            value: mess.messages_ru[6]
+                        }
+                    }
+
+                    if (hexVal.length > 5) {
+                        return {
+                            state: false,
+                            system: "none",
+                            value: mess.messages_ru[6]
+                        }
+                    }
+
+                    hexVal = hexVal.slice(1);
+                    //console.log(hexVal)
+
+                    //console.log(RegExp.isHexadecimalString(hexVal))
+                    if (RegExp.isHexadecimalString(hexVal)) {
+
+                        return {
+                            state: true,
+                            system: "h",
+                            value: hexVal
+                        }
+                    }
+                    else {
+                        return {
+                            state: false,
+                            system: "none",
+                            value: mess.messages_ru[6]
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (RegExp.isDecimalString(val)) {
+                const valNum = parseInt(val);
+
+                if (!valNum) {
+                    return {
+                        state: false,
+                        system: "none",
+                        value: mess.messages_ru[6]
+                    }
+                }
+
+                if (valNum > 65535) {
                     return {
                         state: false,
                         system: "none",
@@ -53,100 +141,23 @@ export class Reader {
                     }
                 }
 
-                if (RegExp.isBinaryString(binVal)) {
-                    return {
-                        state: true,
-                        system: "b",
-                        value: binVal
-                    }
-                }
-                else {
-                    return {
-                        state: false,
-                        system: "none",
-                        value: mess.messages_ru[6]
-                    }
-                }
-                break;
-            }
-            case "h": {
-                let hexVal = val.slice(0, -1);
-
-                console.log(hexVal)
-                if (hexVal.slice(0, 1) !== "0") {
-                    return {
-                        state: false,
-                        system: "none",
-                        value: mess.messages_ru[6]
-                    }
-                }
-
-                if (hexVal.length > 5) {
-                    return {
-                        state: false,
-                        system: "none",
-                        value: mess.messages_ru[6]
-                    }
-                }
-
-                hexVal = hexVal.slice(1);
-                //console.log(hexVal)
-
-                //console.log(RegExp.isHexadecimalString(hexVal))
-                if (RegExp.isHexadecimalString(hexVal)) {
-
-                    return {
-                        state: true,
-                        system: "h",
-                        value: hexVal
-                    }
-                }
-                else {
-                    return {
-                        state: false,
-                        system: "none",
-                        value: mess.messages_ru[6]
-                    }
-                }
-                break;
-            }
-        }
-
-        if (RegExp.isDecimalString(val)) {
-            const valNum = parseInt(val);
-
-            if (!valNum) {
                 return {
-                    state: false,
-                    system: "none",
-                    value: mess.messages_ru[6]
+                    state: true,
+                    system: "d",
+                    value: val
                 }
+
             }
 
-            if (valNum > 65535) {
+            if (registersNameList.includes(val)) {
+                //console.log("asa")
                 return {
-                    state: false,
-                    system: "none",
-                    value: mess.messages_ru[5]
+                    state: true,
+                    system: "register",
+                    value: val
                 }
+
             }
-
-            return {
-                state: true,
-                system: "d",
-                value: val
-            }
-
-        }
-
-        if (registersNameList.includes(val)) {
-            //console.log("asa")
-            return {
-                state: true,
-                system: "register",
-                value: val
-            }
-
         }
 
         return {

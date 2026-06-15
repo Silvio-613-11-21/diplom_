@@ -16,5 +16,28 @@ export class Convertor {
         return parseInt(num, from).toString(to).toUpperCase()
     }
 
-    
+    static normalization(num: string, system: 2 | 10 | 16) {
+        switch (system) {
+            case 16: {
+                while (num.length < 4) {
+                    num = "0" + num;
+                }
+                return num;
+            }
+            case 10: {
+                while (num.length < 5) {
+                    num = "0" + num;
+                }
+                return num;
+            }
+            case 2: {
+                while (num.length < 16) {
+                    num = "0" + num;
+                }
+                return num;
+            }
+        }
+    }
+
+
 }

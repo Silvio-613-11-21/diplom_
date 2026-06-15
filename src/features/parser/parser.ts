@@ -82,7 +82,7 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
             return mess.messages_ru[4];
         }
 
-        const checkedValue = Reader.checkValue(value, registersNameList);
+        const checkedValue = Reader.checkValue(value, cmd, registersNameList);
         if (checkedValue.state === false) {
             return checkedValue.value;
         }

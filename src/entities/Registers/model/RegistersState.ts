@@ -1,5 +1,4 @@
 
-
 export class RegistersState {
     protected RegistersNameList: string[] = [
         "ax", "bx", "cx", "dx",
