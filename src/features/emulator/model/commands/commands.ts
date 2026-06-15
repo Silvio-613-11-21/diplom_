@@ -1,8 +1,6 @@
 export class Commands {
 
-    private constructor() { }
-    
-    public static shl(val: string, step: number): string {
+    static shl(val: string, step: number): string {
         let len = val.length;
         len = len - step;
 

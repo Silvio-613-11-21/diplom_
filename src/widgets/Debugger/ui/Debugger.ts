@@ -79,14 +79,19 @@ export class Debugger {
     //===================================================================
     public consolePrint(message: string) {
         this.debState = 'cons';
-        this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent); 
-        this.consContent.textContent = ''; 
-        this.consContent.textContent = message; 
+        this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent);
+        this.consContent.textContent = '';
+        this.consContent.textContent = message;
     }
 
-    public debbCall(){
-        this.debState = 'deb'; 
-        this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent); 
+    public debbCall() {
+        this.debState = 'deb';
+        this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent);
+    }
+
+    public resetAll() {
+        this.reg.resetAll();
+        this.flagReg.resetAll(); 
     }
 }
 

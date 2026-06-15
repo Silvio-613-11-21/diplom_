@@ -1,20 +1,20 @@
 export class Convertor {
 
-    private constructor() { };
+    // public static decimalToBin(decNum: string) {
+    //     return parseFloat(decNum).toString(2);
+    // }
 
-    public static decimalToBin(decNum: string) {
-        return parseFloat(decNum).toString(2);
-    }
+    // public static binToHex(binNum: string) {
+    //     return parseInt(binNum, 2).toString(16).toUpperCase()
+    // }
 
-    public static binToHex(binNum: string) {
-        return parseInt(binNum, 2).toString(16).toUpperCase()
-    }
+    // public static hexToBin(hexNum: string) {
+    //     return parseInt(hexNum, 16).toString(2)
+    // }
 
-    public static hexToBin(hexNum: string) {
-        return parseInt(hexNum, 16).toString(2)
-    }
-
-    public static convert(num: string, from: number, to: number) {
+    static convert(num: string, from: number, to: number) {
         return parseInt(num, from).toString(to).toUpperCase()
     }
+
+    
 }

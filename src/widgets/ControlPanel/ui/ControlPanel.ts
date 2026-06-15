@@ -8,7 +8,7 @@ import { Debugger } from 'src/widgets/Debugger';
 
 
 import { emulator } from 'src/features/emulator';
-import { parser } from 'src/features/parser/model/parser';
+import { parser } from 'src/features/parser/parser';
 
 //=================================================
 import { Restricts } from 'src/shared/types/Restricts';
@@ -49,6 +49,7 @@ export class ControlPanel {
         let instructions = parser(code, restricts.cmd, restricts.rl); 
         if(typeof instructions == 'string'){
             this.debugger_.consolePrint(instructions);
+            this.instructions = null; 
         }
         else{
             this.instructions = instructions; 
@@ -57,6 +58,8 @@ export class ControlPanel {
     } 
 
     private runEmulate(){
+        this.debugger_.resetAll(); 
+
         if(typeof this.instructions == 'string'){
             return; 
         }
