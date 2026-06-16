@@ -12,6 +12,7 @@ export function parser(code: string, commandsList: string[], registersNameList: 
     code = RegExp.delComments(code);
     code = RegExp.delSpace(code);
     code = RegExp.delLineBreackInStart(code);
+    code = RegExp.unitLineBreack(code); 
 
     const res = objTransformer(code, commandsList, registersNameList);
     console.log(res)

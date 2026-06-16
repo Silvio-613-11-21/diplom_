@@ -1,5 +1,5 @@
-export 
-class RegExp { //потом исправить
+export
+    class RegExp { //потом исправить
 
     static delComments(code: string) {
         const regExp = /;.*(?=\n)/g
@@ -14,6 +14,10 @@ class RegExp { //потом исправить
         return code.replace(/^\n+/, "");
     }
 
+    static unitLineBreack(code: string) {
+        return code.replace(/\n+/g, '\n');
+    }
+
     //====================================
     static isBinaryString(str: string) {
         return /^[01]+$/.test(str);
@@ -24,6 +28,6 @@ class RegExp { //потом исправить
     }
 
     static isDecimalString(str: string) {
-        return /^[0-9]+$/.test(str);
+        return /^[+-]?[0-9]+$/.test(str);
     }
 }

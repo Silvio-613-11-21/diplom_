@@ -17,8 +17,9 @@ export class Registers extends RegistersState {
     
 
     public override setValue(name: string, value:string) : boolean {
+        
         let reg = document.getElementById(`${name}`) as HTMLElement;
-        reg.textContent =  `${value}`; 
+        reg.textContent =  `${value.toUpperCase()}`; 
         
         return super.setValue(name, value);
     }

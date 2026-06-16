@@ -68,7 +68,7 @@ export class ControlPanel {
         }
         else{
             this.debugger_.debbCall(); 
-            emulator(this.instructions, this.editor, this.debugger_); 
+            emulator(this.instructions, this.debugger_); 
         }
     }
 }
