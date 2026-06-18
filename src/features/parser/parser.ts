@@ -1,4 +1,7 @@
-import { SimpleInstruction } from "src/shared/types/ASMcode/SimpleInstruction";
+import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
+import { Label } from "shared/types/ASMcode/Label";
+import { LabelInstruction } from "shared/types/ASMcode/LabelInstruction";
+
 import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 
 import { RegExp } from "./model/RegExp";
@@ -9,10 +12,12 @@ import mess from "./config/messages.json"
 
 export function parser(code: string, commandsList: string[], registersNameList: string[]) {
     code = code.toLowerCase();
-    code = RegExp.delComments(code);
-    code = RegExp.delSpace(code);
-    code = RegExp.delLineBreackInStart(code);
     code = RegExp.unitLineBreack(code);
+    code = RegExp.delLineBreackInStart(code);
+    code = RegExp.delSpace(code);
+    code = RegExp.delComments(code);
+
+
 
     const res = objTransformer(code, commandsList, registersNameList);
     console.log(res)
@@ -24,10 +29,8 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
     let error_ = "unknow err"
 
     let allInstr: AllInstructions[] = [];
+    let labels: String[] = [];
 
-    let simpleInstr: SimpleInstruction[] = [];
-
-    //const cmdLen = commandsList.length;
     const codeLen = code.length;
     if (codeLen === 0) {
         return mess.messages_ru[0];
@@ -42,11 +45,22 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
             = simpleInctructionProcessing(code, commandsList, registersNameList, i);
 
         if (typeof simpleInstrCheck === 'string') {
-            return simpleInstrCheck
+            let labelCheck = labelProcessing(code, i);
+            if (labelCheck) {
+                labels.push(labelCheck.label.name);
+                const hasDuplicates = new Set(labels).size !== labels.length;
+                if (hasDuplicates) {
+                    return simpleInstrCheck
+                }
+                allInstr[instrIndex] = labelCheck.label;
+                i = labelCheck.i;
+            }
+            else {
+                return simpleInstrCheck
+            }
         }
         else {
             allInstr[instrIndex] = simpleInstrCheck.simpleInstr
-            simpleInstr[instrIndex] = simpleInstrCheck.simpleInstr
             i = simpleInstrCheck.i
         }
 
@@ -57,6 +71,33 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
     return allInstr;
 }
 
+
+function labelProcessing(code: string, i: number,) {
+
+    let label: Label = {
+        kind: 'lb',
+        name: ''
+    }
+
+    while (code[i] != '\n') {
+        label.name += code[i];
+
+        i++;
+        if (i >= code.length) break;
+    }
+    i++;
+
+    if (RegExp.isEndsWithColon(label.name)) {
+        label.name = RegExp.removeEndColon(label.name);
+    }
+
+    if (label.name !== '') {
+        return { label, i };
+    }
+
+    return false;
+
+}
 
 function simpleInctructionProcessing(code: string,
     commandsList: string[],

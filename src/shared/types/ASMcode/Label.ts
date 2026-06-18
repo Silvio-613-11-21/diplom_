@@ -1,4 +1,4 @@
 export interface Label{
-    kind: 'lb'
+    kind: 'lb';
     name: string; 
 }

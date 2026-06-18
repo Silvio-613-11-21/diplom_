@@ -30,4 +30,16 @@ export
     static isDecimalString(str: string) {
         return /^[+-]?[0-9]+$/.test(str);
     }
+
+    //=================================
+
+    static isEndsWithColon(str: string) {
+        return /:$/.test(str);
+    }
+
+    static removeEndColon(str: string) {
+        return str.replace(/:$/, '');
+    }
+
+    //=============================
 }
