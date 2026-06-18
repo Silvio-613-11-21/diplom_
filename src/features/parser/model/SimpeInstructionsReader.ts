@@ -1,8 +1,8 @@
-import { ResgisterValue } from "src/shared/types/RegisterValue";
+import { ResgisterValue } from "src/shared/types/ASMcode/RegisterValue";
 import mess from "../config/messages.json"
 import { RegExp } from "./RegExp";
 
-export class Reader {
+export class SimpleInstructionsReader {
 
     static registers(index: number, code: string, registersNameList: string[]): string | null {
         for (let i = 0; i < registersNameList.length; i++) {

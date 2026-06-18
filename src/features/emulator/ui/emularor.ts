@@ -1,18 +1,23 @@
 import { Commands as cmd } from "../model/commands/commands";
 import { Convertor as cv } from "../model/сonvertor/convertor";
 
-import { SimpleInstruction } from "src/shared/types/SimpleInstruction";
+import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
+import { Label } from "shared/types/ASMcode/Label";
+import { LabelInstruction } from "src/shared/types/ASMcode/LabelInstruction";
+import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 
 import { Debugger } from 'src/widgets/Debugger';
 
 import mess from '../config/errors.json'
 
-export function emulator(instrs: SimpleInstruction[], debugger_: Debugger,) {
+export function emulator(instrs: AllInstructions[], debugger_: Debugger,) {
 
     debugger_.resetAll();
 
     for (const instr of instrs) {
-        cmdSwitcher(instr, debugger_);
+        if (instr.kind === 'smplinstr') {
+            cmdSwitcher(instr, debugger_);
+        }
     }
 
 }
@@ -155,7 +160,7 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
 
             if (typeof val === 'string') {
                 val = cv.convert(val, 16, 2)
-                val = cv.normalization(val,2);
+                val = cv.normalization(val, 2);
                 console.log(val)
 
                 let mask;
@@ -198,7 +203,7 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
 
             if (typeof val === 'string') {
                 val = cv.convert(val, 16, 2)
-                val = cv.normalization(val,2);
+                val = cv.normalization(val, 2);
                 console.log(val)
 
                 let mask;
@@ -240,7 +245,7 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
 
             if (typeof val === 'string') {
                 val = cv.convert(val, 16, 2)
-                val = cv.normalization(val,2);
+                val = cv.normalization(val, 2);
                 console.log(val)
 
                 let mask;
@@ -276,7 +281,13 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
             }
             break;
         }
+
+        case "inc": {
+
+        }
+
     }
+
 }
 
 
@@ -306,4 +317,7 @@ function mormalizationValueSystem(instr: SimpleInstruction, to: 2 | 10 | 16) {
             return val;
         }
     }
+
+
+
 }

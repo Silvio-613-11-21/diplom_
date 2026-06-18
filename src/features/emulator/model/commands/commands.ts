@@ -1,4 +1,4 @@
-import { ResgisterValue } from "src/shared/types/RegisterValue";
+import { ResgisterValue } from "src/shared/types/ASMcode/RegisterValue";
 import { Convertor as cv } from "../сonvertor/convertor";
 
 export class Commands {

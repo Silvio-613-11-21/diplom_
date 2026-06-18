@@ -1,4 +1,4 @@
-import { Restricts } from "src/shared/types/Restricts";
+import { Restricts } from "src/shared/types/Restricts/Restricts";
 import { getRestrists } from "src/shared/Restricts/getRestricts";
 
 export function setRestricts(): Restricts | null | undefined{

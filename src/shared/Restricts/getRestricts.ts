@@ -1,4 +1,4 @@
-import { Restricts } from "../types/Restricts"
+import { Restricts } from "../types/Restricts/Restricts"
 
 export function getRestrists(lab: number, z: number): Restricts | undefined | null {
     const labs = [lab1]

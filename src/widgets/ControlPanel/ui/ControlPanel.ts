@@ -11,8 +11,8 @@ import { emulator } from 'src/features/emulator';
 import { parser } from 'src/features/parser/parser';
 
 //=================================================
-import { Restricts } from 'src/shared/types/Restricts';
-import { SimpleInstruction } from 'src/shared/types/SimpleInstruction';
+import { Restricts } from 'src/shared/types/Restricts/Restricts';
+import { AllInstructions } from 'src/shared/types/ASMcode/AllInstructions';
 //=================================================
 
 
@@ -23,7 +23,7 @@ export class ControlPanel {
     private assembleBtn: HTMLButtonElement | null = null ;
     private runAllBtn: HTMLButtonElement | null = null;
 
-    private instructions: SimpleInstruction[] | string | null = null; 
+    private instructions: AllInstructions[] | string | null = null; 
     private restricts:Restricts | null | undefined = null;  
 
     constructor (App: HTMLElement, editor: Editor, debugger_: Debugger, restricts: Restricts | null | undefined ) {    
