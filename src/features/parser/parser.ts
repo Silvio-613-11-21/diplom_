@@ -45,18 +45,20 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
             = simpleInctructionProcessing(code, commandsList, registersNameList, i);
 
         if (typeof simpleInstrCheck === 'string') {
-            let labelCheck = labelProcessing(code, i);
-            if (labelCheck) {
-                labels.push(labelCheck.label.name);
-                const hasDuplicates = new Set(labels).size !== labels.length;
-                if (hasDuplicates) {
+            if (1) {
+                let labelCheck = labelProcessing(code, i);
+                if (labelCheck) {
+                    labels.push(labelCheck.label.name);
+                    const hasDuplicates = new Set(labels).size !== labels.length;
+                    if (hasDuplicates) {
+                        return simpleInstrCheck
+                    }
+                    allInstr[instrIndex] = labelCheck.label;
+                    i = labelCheck.i;
+                }
+                else {
                     return simpleInstrCheck
                 }
-                allInstr[instrIndex] = labelCheck.label;
-                i = labelCheck.i;
-            }
-            else {
-                return simpleInstrCheck
             }
         }
         else {
@@ -72,7 +74,7 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
 }
 
 
-function labelProcessing(code: string, i: number,) {
+function labelProcessing(code: string, i: number) {
 
     let label: Label = {
         kind: 'lb',
@@ -89,14 +91,13 @@ function labelProcessing(code: string, i: number,) {
 
     if (RegExp.isEndsWithColon(label.name)) {
         label.name = RegExp.removeEndColon(label.name);
-    }
 
-    if (label.name !== '') {
-        return { label, i };
+        if (label.name !== '') {
+            return { label, i };
+        }
     }
 
     return false;
-
 }
 
 function simpleInctructionProcessing(code: string,

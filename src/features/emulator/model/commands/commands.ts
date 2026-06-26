@@ -33,13 +33,13 @@ export class Commands {
 
         if (!isNaN(val_1Num) && !isNaN(val_2Num)) {
             let resNumVal = val_1Num + val_2Num;
-            let resVal = resNumVal.toString(16);
+            let resVal = resNumVal.toString(system);
 
 
             if (resNumVal >= 0) {
                 return {
                     state: true,
-                    system: 'h',
+                    system: 'none',
                     value: resVal
                 }
             }
@@ -48,7 +48,7 @@ export class Commands {
 
                 return {
                     state: true,
-                    system: 'h',
+                    system: 'none',
                     value: resVal
                 }
             }
@@ -68,12 +68,12 @@ export class Commands {
 
         if (!isNaN(val_1Num) && !isNaN(val_2Num)) {
             let resNumVal = val_1Num - val_2Num;
-            let resVal = resNumVal.toString(16);
+            let resVal = resNumVal.toString(system);
 
             if (resNumVal >= 0) {
                 return {
                     state: true,
-                    system: 'h',
+                    system: 'none',
                     value: resVal
                 }
             }
@@ -82,7 +82,7 @@ export class Commands {
 
                 return {
                     state: true,
-                    system: 'h',
+                    system: 'none',
                     value: resVal
                 }
             }

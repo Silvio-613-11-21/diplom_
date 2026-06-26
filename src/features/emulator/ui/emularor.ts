@@ -16,13 +16,13 @@ export function emulator(instrs: AllInstructions[], debugger_: Debugger,) {
 
     for (const instr of instrs) {
         if (instr.kind === 'smplinstr') {
-            cmdSwitcher(instr, debugger_);
+            cmdSwitcher(instr, debugger_, 16);
         }
     }
 
 }
 
-function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
+function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger, NumSys: 2 | 10 | 16) {
     switch (instr.command) {
         case "mov": {
             if (instr.secondRegister.system === 'none') {
@@ -37,7 +37,7 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
                 break;
             }
 
-            let val = mormalizationValueSystem(instr, 16);
+            let val = normalizationValueSystem(instr, NumSys);
             if (val) {
                 debugger_.reg.setValue(instr.register, val)
                 break;
@@ -53,11 +53,11 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
                 let unprocVal = debugger_.reg.getValueByName(instr.register);
                 //console.log(unprocVal)
                 if (unprocVal) {
-                    unprocVal = cv.convert(unprocVal, 16, 2);
-                    unprocVal = cv.normalization(unprocVal, 2);
+                    unprocVal = cv.convert(unprocVal, NumSys, 2);
+                   
                     let resVal = cmd.shl(unprocVal, step)
-                    resVal = cv.convert(resVal, 2, 16);
-                    resVal = cv.normalization(resVal, 16);
+                    resVal = cv.convert(resVal, 2, NumSys);
+                    
 
                     debugger_.reg.setValue(instr.register, resVal);
 
@@ -73,14 +73,10 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
                 let unprocVal = debugger_.reg.getValueByName(instr.register);
                 //console.log(unprocVal)
                 if (unprocVal) {
-                    unprocVal = cv.convert(unprocVal, 16, 2);
-                    unprocVal = cv.normalization(unprocVal, 2);
+                    unprocVal = cv.convert(unprocVal, NumSys, 2);
                     let resVal = cmd.shr(unprocVal, step)
-                    resVal = cv.convert(resVal, 2, 16);
-                    resVal = cv.normalization(resVal, 16);
-
+                    resVal = cv.convert(resVal, 2, NumSys);
                     debugger_.reg.setValue(instr.register, resVal);
-
                 }
             }
             break;
@@ -94,24 +90,24 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
                     val_2 = debugger_.reg.getValueByName(instr.secondRegister.value);
                 }
                 else {
-                    val_2 = mormalizationValueSystem(instr, 16);
+                    val_2 = normalizationValueSystem(instr, NumSys);
                 }
 
                 if (val_2) {
-                    let resVal = cmd.add(val_1, val_2, 16);
+                    let resVal = cmd.add(val_1, val_2, NumSys);
 
                     if (resVal.state == false) {
                         debugger_.consolePrint(mess.errors_ru[0]);
                         break;
                     }
 
-                    if (resVal.value.length > 4) {
+                    if (!overflowChech(resVal.value, NumSys)) {
                         debugger_.consolePrint(mess.errors_ru[1]);
                         break;
                     }
 
                     if (resVal.state == true) {
-                        resVal.value = cv.normalization(resVal.value, 16);
+                        resVal.value = cv.normalization(resVal.value, NumSys);
                         debugger_.reg.setValue(instr.register, resVal.value);
                         break
                     }
@@ -128,24 +124,24 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
                     val_2 = debugger_.reg.getValueByName(instr.secondRegister.value);
                 }
                 else {
-                    val_2 = mormalizationValueSystem(instr, 16);
+                    val_2 = normalizationValueSystem(instr, NumSys);
                 }
 
                 if (val_2) {
-                    let resVal = cmd.sub(val_1, val_2, 16);
+                    let resVal = cmd.sub(val_1, val_2, NumSys);
 
                     if (resVal.state == false) {
                         debugger_.consolePrint(mess.errors_ru[0]);
                         break;
                     }
 
-                    if (resVal.value.length > 4) {
+                    if (!overflowChech(resVal.value, NumSys)) {
                         debugger_.consolePrint(mess.errors_ru[1]);
                         break;
                     }
 
                     if (resVal.value) {
-                        resVal.value = cv.normalization(resVal.value, 16);
+                        resVal.value = cv.normalization(resVal.value, NumSys);
                         debugger_.reg.setValue(instr.register, resVal.value);
                         break
                     }
@@ -159,20 +155,19 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
 
 
             if (typeof val === 'string') {
-                val = cv.convert(val, 16, 2)
-                val = cv.normalization(val, 2);
+                val = cv.convert(val, NumSys, 2)
                 console.log(val)
 
                 let mask;
                 if (instr.secondRegister.system === 'register') {
 
                     mask = debugger_.reg.getValueByName(instr.secondRegister.value);
-                    mask = cv.convert(mask!, 16, 2)
+                    mask = cv.convert(mask!, NumSys, 2)
 
                 }
                 else {
 
-                    mask = mormalizationValueSystem(instr, 2);
+                    mask = normalizationValueSystem(instr, 2);
                     console.log(mask)
                 }
 
@@ -181,8 +176,8 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
                     let resVal = cmd.and(val, mask);
                     console.log(resVal)
 
-                    resVal = cv.convert(resVal, 2, 16);
-                    resVal = cv.normalization(resVal, 16)
+                    resVal = cv.convert(resVal, 2, NumSys);
+                  
                     console.log(resVal)
 
 
@@ -202,20 +197,18 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
 
 
             if (typeof val === 'string') {
-                val = cv.convert(val, 16, 2)
-                val = cv.normalization(val, 2);
+                val = cv.convert(val, NumSys, 2)
                 console.log(val)
 
                 let mask;
                 if (instr.secondRegister.system === 'register') {
-
                     mask = debugger_.reg.getValueByName(instr.secondRegister.value);
-                    mask = cv.convert(mask!, 16, 2)
+                    mask = cv.convert(mask!, NumSys, 2)
 
                 }
                 else {
 
-                    mask = mormalizationValueSystem(instr, 2);
+                    mask = normalizationValueSystem(instr, 2);
                     console.log(mask)
                 }
 
@@ -224,8 +217,7 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
                     let resVal = cmd.or(val, mask);
                     console.log(resVal)
 
-                    resVal = cv.convert(resVal, 2, 16);
-                    resVal = cv.normalization(resVal, 16)
+                    resVal = cv.convert(resVal, 2, NumSys);
                     console.log(resVal)
 
 
@@ -244,20 +236,19 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
             let val = debugger_.reg.getValueByName(instr.register);
 
             if (typeof val === 'string') {
-                val = cv.convert(val, 16, 2)
-                val = cv.normalization(val, 2);
+                val = cv.convert(val, NumSys, 2)
                 console.log(val)
 
                 let mask;
                 if (instr.secondRegister.system === 'register') {
 
                     mask = debugger_.reg.getValueByName(instr.secondRegister.value);
-                    mask = cv.convert(mask!, 16, 2)
+                    mask = cv.convert(mask!, NumSys, 2)
 
                 }
                 else {
 
-                    mask = mormalizationValueSystem(instr, 2);
+                    mask = normalizationValueSystem(instr, 2);
                     console.log(mask)
                 }
 
@@ -266,8 +257,7 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
                     let resVal = cmd.xor(val, mask);
                     console.log(resVal)
 
-                    resVal = cv.convert(resVal, 2, 16);
-                    resVal = cv.normalization(resVal, 16)
+                    resVal = cv.convert(resVal, 2, NumSys);
                     console.log(resVal)
 
 
@@ -282,26 +272,24 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger) {
             break;
         }
 
-        case "inc": {
+        // case "inc": {
 
-        }
+        // }
 
     }
 
 }
 
 
-function mormalizationValueSystem(instr: SimpleInstruction, to: 2 | 10 | 16) {
+function normalizationValueSystem(instr: SimpleInstruction, to: 2 | 10 | 16) {
 
     if (instr.secondRegister.system === 'h') {
         let val = cv.convert(instr.secondRegister.value, 16, to);
-        val = cv.normalization(val, to);
         return val;
     }
 
     if (instr.secondRegister.system === "b") {
         let val = cv.convert(instr.secondRegister.value, 2, to);
-        val = cv.normalization(val, to);
         return val;
     }
     else if (instr.secondRegister.system === "d") {
@@ -309,7 +297,6 @@ function mormalizationValueSystem(instr: SimpleInstruction, to: 2 | 10 | 16) {
 
         if (valNum >= 0) {
             let val = cv.convert(instr.secondRegister.value, 10, to);
-            val = cv.normalization(val, to);
             return val;
         }
         else {
@@ -318,6 +305,33 @@ function mormalizationValueSystem(instr: SimpleInstruction, to: 2 | 10 | 16) {
         }
     }
 
+}
 
+
+function overflowChech (num: string, NumSys: 2 | 10 | 16){
+    if (NumSys == 2) {
+        if (num.length > 16) {
+            return false; 
+        }
+    }
+
+    if(NumSys == 10){
+        let decNum = parseInt(num); 
+        if(isNaN(decNum)){
+            return false; 
+        }
+
+        if(decNum > 65535){
+            return false; 
+        }
+    }
+
+    if(NumSys == 16){
+        if(num.length > 4) {
+            return false; 
+        }
+    }
+
+    return true; 
 
 }

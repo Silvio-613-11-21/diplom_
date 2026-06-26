@@ -2,10 +2,14 @@
 export class Convertor {
 
     static convert(num: string, from: number, to: number) {
-        return parseInt(num, from).toString(to).toUpperCase()
+        let transNum = parseInt(num, from).toString(to).toUpperCase(); 
+        if([2,10,16].includes(to)){
+            transNum = this.normalization(transNum, to as 2 |10 | 16);
+        } 
+        return transNum; 
     }
 
-    static normalization(num: string, system: 2 | 10 | 16) {
+    static normalization(num: string, system: 2 | 10 | 16 ) {
         switch (system) {
             case 16: {
                 while (num.length < 4) {
