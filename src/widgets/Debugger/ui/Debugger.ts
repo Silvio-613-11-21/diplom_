@@ -4,12 +4,14 @@ import html from './Debugger.html?raw'
 
 import { Registers } from "src/entities/Registers";
 import { FlagRegisters } from 'src/entities/FlagRegister';
+import { CodeSegment } from 'src/entities/CodeSegment';
 
 
 export class Debugger {
     public debState: "deb" | "cons" = "deb"
     public reg!: Registers
     public flagReg!: FlagRegisters;
+    public codeSegment!: CodeSegment;  
 
     // =======================================
 
@@ -30,9 +32,11 @@ export class Debugger {
 
         const registersSpace = document.querySelector(".registers-space") as HTMLElement;
         const flagRegistersSpace = document.querySelector(".flag-registers-space") as HTMLElement;
+        const codeSegmentSpace = document.querySelector(".code-segment-space") as HTMLElement;  
 
         this.reg = new Registers(registersSpace);
         this.flagReg = new FlagRegisters(flagRegistersSpace);
+        this.codeSegment = new CodeSegment(codeSegmentSpace); 
 
         this.debSwBtn = document.querySelector(".debbuder-switch-btn") as HTMLButtonElement;
         this.consSwBtn = document.querySelector(".console-switch-btn") as HTMLButtonElement;
