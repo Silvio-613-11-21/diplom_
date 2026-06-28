@@ -75,7 +75,7 @@ export class CodeSegment {
     }
 
 
-
+    // =====================================================
     private instrParser(instr: AllInstructions, i: number) {
         let res = String(i + 1) + '.  ';
 
@@ -93,7 +93,13 @@ export class CodeSegment {
             res += ':'
         }
 
-        console.log(res)
+
+        if(instr.kind == 'lbinstr') {
+            res += instr.cmd;
+            res += '    ';
+            res += instr.label; 
+        }
+        //console.log(res)
         return res;
 
     }

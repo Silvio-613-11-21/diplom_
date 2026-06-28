@@ -1,5 +1,5 @@
 export interface LabelInstruction{
     kind: "lbinstr";
-    cmd: string;
-    label: string
+    cmd: "loop" | "js" | "jns" | "jz" | "jnz" | "none";
+    label: string; 
 }

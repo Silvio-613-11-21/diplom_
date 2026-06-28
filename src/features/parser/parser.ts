@@ -1,35 +1,41 @@
-import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
-import { Label } from "shared/types/ASMcode/Label";
-import { LabelInstruction } from "shared/types/ASMcode/LabelInstruction";
+
 
 import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 
 import { RegExp } from "./model/RegExp";
-import { SimpleInstructionsReader as SIR } from "./model/SimpeInstructionsReader";
+import { InsrtrInspector as InsIn } from "./model/InstructionCheckers";
+
 import mess from "./config/messages.json"
 
-
+let labels: string[] ;
+let labelsFromInstr: string[] ;
 
 export function parser(code: string, commandsList: string[], registersNameList: string[]) {
+    labels = [] ;
+    labelsFromInstr = [] ;
+
     code = code.toLowerCase();
     code = RegExp.unitLineBreack(code);
     code = RegExp.delLineBreackInStart(code);
     code = RegExp.delSpace(code);
     code = RegExp.delComments(code);
-
-
-
+    
     const res = objTransformer(code, commandsList, registersNameList);
     console.log(res)
+
+    if(!labelsCheck(labels, labelsFromInstr)){
+        return mess.messages_ru[8]; 
+    }
+
     return res;
 }
 
 // командарегистр,значение\n 
 function objTransformer(code: string, commandsList: string[], registersNameList: string[]) {
-    let error_ = "unknow err"
+    //let error_ = "unknow err"
 
     let allInstr: AllInstructions[] = [];
-    let labels: String[] = [];
+    
 
     const codeLen = code.length;
     if (codeLen === 0) {
@@ -42,24 +48,32 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
 
         //============================
         let simpleInstrCheck
-            = simpleInctructionProcessing(code, commandsList, registersNameList, i);
+            =  InsIn.simpleInctructionProcessing(code, commandsList, registersNameList, i);
 
         if (typeof simpleInstrCheck === 'string') {
-            if (1) {
-                let labelCheck = labelProcessing(code, i);
-                if (labelCheck) {
-                    labels.push(labelCheck.label.name);
-                    const hasDuplicates = new Set(labels).size !== labels.length;
-                    if (hasDuplicates) {
-                        return simpleInstrCheck
-                    }
-                    allInstr[instrIndex] = labelCheck.label;
-                    i = labelCheck.i;
-                }
-                else {
+
+            let labelCheck = InsIn.labelProcessing(code, i);
+            let labelInstrCheck = InsIn.labelInstructionCheck(code, commandsList, i);
+
+            if (labelCheck) {
+                labels.push(labelCheck.label.name);
+                const hasDuplicates = new Set(labels).size !== labels.length;
+                if (hasDuplicates) {
                     return simpleInstrCheck
                 }
+                allInstr[instrIndex] = labelCheck.label;
+                i = labelCheck.i;
             }
+            
+            else if (labelInstrCheck) {
+                labelsFromInstr.push(labelInstrCheck.labelInstr.label); 
+                allInstr[instrIndex] = labelInstrCheck.labelInstr; 
+                i = labelInstrCheck.i; 
+            }
+            else {
+                return simpleInstrCheck;
+            }
+
         }
         else {
             allInstr[instrIndex] = simpleInstrCheck.simpleInstr
@@ -73,107 +87,7 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
     return allInstr;
 }
 
-
-function labelProcessing(code: string, i: number) {
-
-    let label: Label = {
-        kind: 'lb',
-        name: ''
-    }
-
-    while (code[i] != '\n') {
-        label.name += code[i];
-
-        i++;
-        if (i >= code.length) break;
-    }
-    i++;
-
-    if (RegExp.isEndsWithColon(label.name)) {
-        label.name = RegExp.removeEndColon(label.name);
-
-        if (label.name !== '') {
-            return { label, i };
-        }
-    }
-
-    return false;
-}
-
-function simpleInctructionProcessing(code: string,
-    commandsList: string[],
-    registersNameList: string[],
-    i: number,
-) {
-
-    let simpleInstr: SimpleInstruction = {
-        kind: 'smplinstr',
-        command: "",
-        register: "",
-        secondRegister: {
-            state: false,
-            system: 'none',
-            value: ""
-        }
-    };
-
-    //==================================================
-    const cmd = SIR.commands(i, code, commandsList);
-    if (cmd === null) {
-        console.log("ya zdes")
-        return mess.messages_ru[1];
-    }
-    else {
-        i += cmd.length;
-        simpleInstr.command = cmd
-    }
-    //==================================================
-
-    //==================================================
-    const rg = SIR.registers(i, code, registersNameList);
-    if (rg === null) {
-        return mess.messages_ru[2];
-    }
-    else {
-        i += rg.length;
-        simpleInstr.register = rg;
-    }
-    //=================================================
-
-    //=================================================
-    if (code[i] === ",") {
-        i++;
-    }
-    else {
-        return mess.messages_ru[3];
-    }
-
-    //================================================
-
-    // ===============================================
-
-    const value = SIR.value(i, code, code.length);
-    if (value.length == 0) {
-        return mess.messages_ru[4];
-    }
-
-    const checkedValue = SIR.checkValue(value, cmd, registersNameList);
-    if (checkedValue.state === false) {
-        return checkedValue.value;
-    }
-
-    simpleInstr.secondRegister = checkedValue;
-
-    i += simpleInstr.secondRegister.value.length + 1; //('\n')
-    if (checkedValue.system === "h") {
-        i += 2; //('0' + 'h')
-    }
-    else if (checkedValue.system === "b") {
-        i += 1; //('b')
-    }
-
-    // ===============================================
-
-    // instrIndex++;
-    return { simpleInstr, i };
+function labelsCheck(labels: string[], labelsFromInstr: string[]): boolean {
+    const labelSet = new Set(labels);
+    return labelsFromInstr.every(label => labelSet.has(label));
 }
