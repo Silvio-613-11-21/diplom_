@@ -10,16 +10,23 @@ import { Debugger } from 'src/widgets/Debugger';
 
 import mess from '../config/errors.json'
 
-export function emulator(instrs: AllInstructions[], debugger_: Debugger,) {
+export function emulator(instrs: AllInstructions[], debugger_: Debugger, i?: number, NumSys: 2 | 10 | 16 = 16) {
 
-    debugger_.resetAll();
 
-    for (const instr of instrs) {
-        if (instr.kind === 'smplinstr') {
-            cmdSwitcher(instr, debugger_, 16);
+    if (i === undefined) {
+        // debugger_.resetAll();
+
+        for (const instr of instrs) {
+            if (instr.kind === 'smplinstr') {
+                cmdSwitcher(instr, debugger_, NumSys);
+            }
         }
     }
-
+    else {
+        if (instrs[i].kind === 'smplinstr') {
+            cmdSwitcher(instrs[i], debugger_, NumSys);
+        }
+    }
 }
 
 function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger, NumSys: 2 | 10 | 16) {
@@ -54,10 +61,10 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger, NumSys: 2 | 
                 //console.log(unprocVal)
                 if (unprocVal) {
                     unprocVal = cv.convert(unprocVal, NumSys, 2);
-                   
+
                     let resVal = cmd.shl(unprocVal, step)
                     resVal = cv.convert(resVal, 2, NumSys);
-                    
+
 
                     debugger_.reg.setValue(instr.register, resVal);
 
@@ -177,7 +184,7 @@ function cmdSwitcher(instr: SimpleInstruction, debugger_: Debugger, NumSys: 2 | 
                     console.log(resVal)
 
                     resVal = cv.convert(resVal, 2, NumSys);
-                  
+
                     console.log(resVal)
 
 
@@ -308,30 +315,30 @@ function normalizationValueSystem(instr: SimpleInstruction, to: 2 | 10 | 16) {
 }
 
 
-function overflowChech (num: string, NumSys: 2 | 10 | 16){
+function overflowChech(num: string, NumSys: 2 | 10 | 16) {
     if (NumSys == 2) {
         if (num.length > 16) {
-            return false; 
+            return false;
         }
     }
 
-    if(NumSys == 10){
-        let decNum = parseInt(num); 
-        if(isNaN(decNum)){
-            return false; 
+    if (NumSys == 10) {
+        let decNum = parseInt(num);
+        if (isNaN(decNum)) {
+            return false;
         }
 
-        if(decNum > 65535){
-            return false; 
-        }
-    }
-
-    if(NumSys == 16){
-        if(num.length > 4) {
-            return false; 
+        if (decNum > 65535) {
+            return false;
         }
     }
 
-    return true; 
+    if (NumSys == 16) {
+        if (num.length > 4) {
+            return false;
+        }
+    }
+
+    return true;
 
 }

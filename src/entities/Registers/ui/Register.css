@@ -1,8 +1,11 @@
 .RegisterTable{
     font-size: x-large;
+
+    display: flex;
+    column-gap: 5px;
 }
 
 .RegisterTable td {
-    width: 70px;
+    min-width: 50px;
     text-align: center;
 }

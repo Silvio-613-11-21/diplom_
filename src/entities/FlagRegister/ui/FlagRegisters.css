@@ -3,6 +3,7 @@
 }
 
 .FlagRegisterTable td {
-    width: 70px;
+    min-width: 35px;  
+    width: auto;
     text-align: center;
 }

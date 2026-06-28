@@ -1,5 +1,7 @@
-
+import './area-init.css'
 import './Debugger.css'
+
+//============================
 import html from './Debugger.html?raw'
 
 import { Registers } from "src/entities/Registers";
@@ -84,6 +86,10 @@ export class Debugger {
     public consolePrint(message: string) {
         this.debState = 'cons';
         this.btnSwitcher(this.debSwBtn, this.consSwBtn, this.debContent, this.consContent);
+        this.consolePrintS(message); 
+    }
+
+    public consolePrintS(message: string){
         this.consContent.textContent = '';
         this.consContent.textContent = message;
     }
@@ -96,6 +102,7 @@ export class Debugger {
     public resetAll() {
         this.reg.resetAll();
         this.flagReg.resetAll(); 
+        this.codeSegment.setStep(0); 
     }
 }
 
