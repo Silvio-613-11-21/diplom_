@@ -99,6 +99,13 @@ export class CodeSegment {
             res += '    ';
             res += instr.label; 
         }
+
+
+        if(instr.kind === 'singleInstr'){
+            res += instr.cmd;
+            res += '    ';
+            res += instr.register; 
+        }
         //console.log(res)
         return res;
 

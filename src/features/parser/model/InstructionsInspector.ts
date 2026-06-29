@@ -1,26 +1,79 @@
 import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
 import { Label } from "shared/types/ASMcode/Label";
 import { LabelInstruction } from "shared/types/ASMcode/LabelInstruction";
+import { SingleInstruction } from "src/shared/types/ASMcode/SingleInstructio";
 
 import { RegExp } from "./RegExp";
 import { SimpleInstructionsReader as SIR } from "./SimpeInstructionsReader";
 import mess from "../config/messages.json"
 
 export class InsrtrInspector {
-    static labelInstructionCheck(code: string, commandsList: string[], i: number) {
+
+    static singleInstructionProcessing(code: string, commandsList: string[], registersNameList: string[], i: number) {
+        let singlInstr: SingleInstruction = {
+            kind: 'singleInstr',
+            cmd: 'none',
+            register: ''
+        }
+
+        let singlInstrList = ["inc", "dec"];
+
+        for (const instr of singlInstrList) {
+            if (instr === code.slice(i, i + instr.length)) {
+                singlInstr.cmd = instr as "inc" | "dec";
+            }
+        }
+
+        if (singlInstr.cmd === 'none') {
+            return false;
+        }
+
+        if (!commandsList.includes(singlInstr.cmd)) {
+            return false;
+        }
+
+        i += singlInstr.cmd.length;
+        //console.log(code[i])
+
+        while (code[i] != '\n') {
+            singlInstr.register += code[i];
+
+            i++;
+            if (i >= code.length) {
+                break;
+            }
+        }
+
+        if (singlInstr.register == '') {
+            return false;
+        }
+        else if (!registersNameList.includes(singlInstr.register)) {
+            return false;
+        }
+
+        else {
+            i += 1; // \n
+            return { singlInstr, i }
+        }
+
+        return false;
+
+    }
 
 
+    static labelInstructionProcessing(code: string, commandsList: string[], i: number) {
+        console.log('ys sddf')
         let labelInstr: LabelInstruction = {
             kind: 'lbinstr',
             cmd: 'none',
             label: '',
         }
 
-        let labelInstrList = ["loop", "js", "jns", "jz", "jnz"];
+        let labelInstrList = ["loop", "js", "jns", "jz", "jnz", "jmp"];
 
         for (const instr of labelInstrList) {
             if (instr === code.slice(i, i + instr.length)) {
-                labelInstr.cmd = instr as "loop" | "js" | "jns" | "jz" | "jnz";
+                labelInstr.cmd = instr as "loop" | "js" | "jns" | "jz" | "jnz" | "jmp";
             }
         }
 
@@ -135,6 +188,7 @@ export class InsrtrInspector {
         // ===============================================
 
         const value = SIR.value(i, code, code.length);
+        // console.log(value)
         if (value.length == 0) {
             return mess.messages_ru[4];
         }
@@ -143,10 +197,12 @@ export class InsrtrInspector {
         if (checkedValue.state === false) {
             return checkedValue.value;
         }
+        console.log(checkedValue)
 
         simpleInstr.secondRegister = checkedValue;
 
         i += simpleInstr.secondRegister.value.length + 1; //('\n')
+
         if (checkedValue.system === "h") {
             i += 2; //('0' + 'h')
         }
@@ -154,9 +210,7 @@ export class InsrtrInspector {
             i += 1; //('b')
         }
 
-        // ===============================================
-
-        // instrIndex++;
+        // ==============================================
         return { simpleInstr, i };
     }
 }

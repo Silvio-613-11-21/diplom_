@@ -33,7 +33,6 @@ export class SimpleInstructionsReader {
 
             if (index >= CodeLen) break;
         }
-
         return val;
     }
 
@@ -123,15 +122,17 @@ export class SimpleInstructionsReader {
             }
 
             if (RegExp.isDecimalString(val)) {
-                const valNum = parseInt(val);
+                //console.log(val)
+                let valNum = parseInt(val);
 
-                if (!valNum) {
-                    return {
-                        state: false,
-                        system: "none",
-                        value: mess.messages_ru[6]
-                    }
-                }
+
+                // if (!valNum) {
+                //     return {
+                //         state: false,
+                //         system: "none",
+                //         value: mess.messages_ru[6]
+                //     }
+                // }
 
                 if (valNum > 65535) {
                     return {

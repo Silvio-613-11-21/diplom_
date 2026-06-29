@@ -3,28 +3,31 @@
 import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 
 import { RegExp } from "./model/RegExp";
-import { InsrtrInspector as InsIn } from "./model/InstructionCheckers";
+import { InsrtrInspector as InsIn } from "./model/InstructionsInspector";
 
 import mess from "./config/messages.json"
 
-let labels: string[] ;
-let labelsFromInstr: string[] ;
+let labels: string[];
+let labelsFromInstr: string[];
 
 export function parser(code: string, commandsList: string[], registersNameList: string[]) {
-    labels = [] ;
-    labelsFromInstr = [] ;
+    labels = [];
+    labelsFromInstr = [];
 
     code = code.toLowerCase();
     code = RegExp.unitLineBreack(code);
     code = RegExp.delLineBreackInStart(code);
     code = RegExp.delSpace(code);
     code = RegExp.delComments(code);
-    
+    code = RegExp.removeEmptyLines(code);
+
     const res = objTransformer(code, commandsList, registersNameList);
     console.log(res)
 
-    if(!labelsCheck(labels, labelsFromInstr)){
-        return mess.messages_ru[8]; 
+    console.log(labels); 
+    console.log(labelsFromInstr);
+    if (!labelsCheck(labels, labelsFromInstr)) {
+        return mess.messages_ru[8];
     }
 
     return res;
@@ -35,7 +38,7 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
     //let error_ = "unknow err"
 
     let allInstr: AllInstructions[] = [];
-    
+
 
     const codeLen = code.length;
     if (codeLen === 0) {
@@ -48,12 +51,14 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
 
         //============================
         let simpleInstrCheck
-            =  InsIn.simpleInctructionProcessing(code, commandsList, registersNameList, i);
+            = InsIn.simpleInctructionProcessing(code, commandsList, registersNameList, i);
 
         if (typeof simpleInstrCheck === 'string') {
 
+    
             let labelCheck = InsIn.labelProcessing(code, i);
-            let labelInstrCheck = InsIn.labelInstructionCheck(code, commandsList, i);
+            let labelInstrCheck = InsIn.labelInstructionProcessing(code, commandsList, i);
+            let singleInstrCheck = InsIn.singleInstructionProcessing(code, commandsList, registersNameList, i);
 
             if (labelCheck) {
                 labels.push(labelCheck.label.name);
@@ -63,13 +68,20 @@ function objTransformer(code: string, commandsList: string[], registersNameList:
                 }
                 allInstr[instrIndex] = labelCheck.label;
                 i = labelCheck.i;
+                
             }
             
             else if (labelInstrCheck) {
-                labelsFromInstr.push(labelInstrCheck.labelInstr.label); 
-                allInstr[instrIndex] = labelInstrCheck.labelInstr; 
-                i = labelInstrCheck.i; 
+                labelsFromInstr.push(labelInstrCheck.labelInstr.label);
+                allInstr[instrIndex] = labelInstrCheck.labelInstr;
+                i = labelInstrCheck.i;
             }
+
+            else if (singleInstrCheck) {
+                allInstr[instrIndex] = singleInstrCheck.singlInstr;
+                i = singleInstrCheck.i; 
+            }
+            
             else {
                 return simpleInstrCheck;
             }

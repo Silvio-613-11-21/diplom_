@@ -18,6 +18,10 @@ export
         return code.replace(/\n+/g, '\n');
     }
 
+    static removeEmptyLines(code: string) {
+        return code.replace(/\n\s*\n/g, '\n');
+    }
+
     //====================================
     static isBinaryString(str: string) {
         return /^[01]+$/.test(str);

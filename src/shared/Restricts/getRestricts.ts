@@ -30,11 +30,11 @@ function lab1(z: number): Restricts | null {
             return { cmd: ["mov", "shr", "shl", "add", "xor", "or", "and"], rl: ["ax", "bx", "cx", "dx"] }
         }
         case 8: {
-            return { cmd: ["mov", "loop", "shl", "inc"], rl: ["ax", "bx", "dx"] }
+            return { cmd: ["mov", "loop", "shl", "inc"], rl: ["ax", "bx", "dx", "cx"] }
         }
         case 9: {
             return {
-                cmd: ["mov", "cmp", "jmp", "js", "jns", "jz", "jnz", "je", "jne", "ja", "jb", "jl", "jg", "jle", "jge", "add", "sub", "inc", "dec"
+                cmd: ["mov", "cmp", "jmp", "js", "jns", "jz", "jnz",  "add", "sub", "inc", "dec"
                 ], rl: ["ax", "bx", "cx", "dx"]
             }
         }

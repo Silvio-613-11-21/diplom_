@@ -7,7 +7,7 @@ import { Debugger } from 'src/widgets/Debugger';
 //=================================================
 
 
-import { emulator } from 'src/features/emulator';
+import { Emulator as em } from 'src/features/emulator';
 import { parser } from 'src/features/parser/parser';
 
 //=================================================
@@ -37,7 +37,7 @@ export class ControlPanel {
         this.init(App);
 
         if (restricts) {
-            this.assembleBtn.addEventListener('click', () => { this.parse(this.editor.content, restricts) })
+            this.assembleBtn.addEventListener('click', () => { this.reset(); this.parse(this.editor.content, restricts) })
             this.runAllBtn.addEventListener('click', () => { this.runEmulate() });
             this.resetBtn.addEventListener('click', () => { this.reset() });
             this.runByStepBtn.addEventListener('click', () => { this.runByStep() });
@@ -77,8 +77,17 @@ export class ControlPanel {
             this.debugger_.debbCall();
             this.debugger_.resetAll();
 
-            emulator(this.instructions, this.debugger_);
-            this.debugger_.codeSegment.setStep("last");
+            let i = 0;
+            while (i < this.instructions.length) {
+                em.emulate(this.instructions, this.debugger_, i);
+                if (em.trFl === false) {
+                    i++;
+                }
+                else {
+                    i = em.step;
+                }
+
+            }
             this.debugger_.consolePrintS("Конец программы")
             this.step = 0;
         }
@@ -98,9 +107,13 @@ export class ControlPanel {
 
             this.debugger_.debbCall();
 
-            emulator(this.instructions, this.debugger_, this.step);
-            this.debugger_.codeSegment.setStep(this.step);
-            this.step++;
+            em.emulate(this.instructions, this.debugger_, this.step);
+            if (em.trFl === false) {
+                this.step++;
+            }
+            else {
+                this.step = em.step;
+            }
         }
         else {
             this.debugger_.consolePrint("Конец программы")
@@ -109,9 +122,15 @@ export class ControlPanel {
         }
     }
 
+    public setStep(step: number) {
+        this.step = step;
+    }
+
     private reset() {
         this.debugger_.resetAll();
         this.debugger_.codeSegment.reset();
         this.instructions = null;
     }
+
+
 }

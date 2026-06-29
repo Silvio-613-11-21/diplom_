@@ -1,1 +1,1 @@
-export { emulator } from "./ui/emularor"
+export { Emulator } from "./ui/emularor"
