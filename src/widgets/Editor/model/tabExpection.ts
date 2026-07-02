@@ -1,24 +1,40 @@
-export function tabExpection
-    (e: KeyboardEvent,
-        textArea: HTMLTextAreaElement | null,
-        content: string) {
+export function tabExpection(
+    e: KeyboardEvent,
+    editableDiv: HTMLDivElement | null
+) {
     if (e.key === "Tab") {
         e.preventDefault();
 
-        if (!textArea) return;
+        if (!editableDiv) return;
 
-        const start = textArea.selectionStart;
-        const end = textArea.selectionEnd;
+        // Получаем выделение
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
 
-        const currentValue = textArea.value;
-        const newValue = currentValue.substring(0, start) + '\t' + currentValue.substring(end);
+        const range = selection.getRangeAt(0);
+        
+        // Если выделение не внутри нашего div — игнорируем
+        if (!editableDiv.contains(range.commonAncestorContainer)) return;
 
-        textArea.value = newValue;
-        content = newValue;
+        // Вставляем символ табуляции через document.execCommand (старый способ)
+        // или через Insert Text (новый, но не везде поддерживается)
+        try {
+            // Современный способ (работает в Chrome, Firefox, Safari)
+            document.execCommand('insertText', false, '\t');
+        } catch {
+            // Fallback: ручная вставка
+            const tabNode = document.createTextNode('\t');
+            range.deleteContents();
+            range.insertNode(tabNode);
+            
+            // Перемещаем курсор после вставленного таба
+            range.setStartAfter(tabNode);
+            range.setEndAfter(tabNode);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
 
-        textArea.selectionStart = start + 1;
-        textArea.selectionEnd = start + 1;
-
-        textArea.dispatchEvent(new Event('input'));
+        // Триггерим событие input для реактивности (если нужно)
+        editableDiv.dispatchEvent(new Event('input', { bubbles: true }));
     }
 }
