@@ -1,31 +1,37 @@
 
-
 import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 
 import { RegExp } from "./model/RegExp";
 import { InsrtrInspector as InsIn } from "./model/InstructionsInspector";
 
 import mess from "./config/messages.json"
+import { linesReader } from "src/widgets/Editor/model/linesReader";
 
 let labels: string[];
 let labelsFromInstr: string[];
 
-export function parser(code: string, commandsList: string[], registersNameList: string[]) {
+export function parser(lines: string[], commandsList: string[], registersNameList: string[]) {
     labels = [];
     labelsFromInstr = [];
 
-    code = code.toLowerCase();
-    code = RegExp.unitLineBreack(code);
-    code = RegExp.delLineBreackInStart(code);
-    code = RegExp.delSpace(code);
-    code = RegExp.delComments(code);
-    code = RegExp.removeEmptyLines(code);
+    
 
-    const res = objTransformer(code, commandsList, registersNameList);
-    console.log(res)
+    lines.forEach((line, i) => { 
+        lines[i] = RegExp.delComments(line)
+        lines[i] = lines[i].toLowerCase();
+    });
 
-    console.log(labels); 
-    console.log(labelsFromInstr);
+    lines.forEach((line, i) => {
+        lines[i] = RegExp.delSpace(line); 
+    })
+
+    let chLines = lines.filter(line => !RegExp.lineIsEmpty(line))
+
+    const res = objTransformer(chLines, commandsList, registersNameList);
+    //console.log(res)
+
+    //console.log(labels);
+    //console.log(labelsFromInstr);
     if (!labelsCheck(labels, labelsFromInstr)) {
         return mess.messages_ru[8];
     }
@@ -33,66 +39,60 @@ export function parser(code: string, commandsList: string[], registersNameList: 
     return res;
 }
 
-// командарегистр,значение\n 
-function objTransformer(code: string, commandsList: string[], registersNameList: string[]) {
+
+function objTransformer(lines: string[], commandsList: string[], registersNameList: string[]) {
     //let error_ = "unknow err"
 
     let allInstr: AllInstructions[] = [];
 
 
-    const codeLen = code.length;
-    if (codeLen === 0) {
+    const linesCount = lines.length;
+    if (linesCount === 0) {
         return mess.messages_ru[0];
     }
 
-    let i = 0;
-    let instrIndex = 0;
-    while (i < codeLen) {
+
+    for (let i = 0; i < linesCount; i++) {
 
         //============================
         let simpleInstrCheck
-            = InsIn.simpleInctructionProcessing(code, commandsList, registersNameList, i);
+            = InsIn.simpleInctructionProcessing(lines[i], commandsList, registersNameList);
+        if (typeof simpleInstrCheck !== 'string') {
+            allInstr.push(simpleInstrCheck)
+            continue;
+        }
+        //===========================
 
-        if (typeof simpleInstrCheck === 'string') {
-
-    
-            let labelCheck = InsIn.labelProcessing(code, i);
-            let labelInstrCheck = InsIn.labelInstructionProcessing(code, commandsList, i);
-            let singleInstrCheck = InsIn.singleInstructionProcessing(code, commandsList, registersNameList, i);
-
-            if (labelCheck) {
-                labels.push(labelCheck.label.name);
-                const hasDuplicates = new Set(labels).size !== labels.length;
-                if (hasDuplicates) {
-                    return simpleInstrCheck
-                }
-                allInstr[instrIndex] = labelCheck.label;
-                i = labelCheck.i;
-                
-            }
-            
-            else if (labelInstrCheck) {
-                labelsFromInstr.push(labelInstrCheck.labelInstr.label);
-                allInstr[instrIndex] = labelInstrCheck.labelInstr;
-                i = labelInstrCheck.i;
-            }
-
-            else if (singleInstrCheck) {
-                allInstr[instrIndex] = singleInstrCheck.singlInstr;
-                i = singleInstrCheck.i; 
-            }
-            
-            else {
+        let labelCheck = InsIn.labelProcessing(lines[i]);
+        if (labelCheck) {
+            labels.push(labelCheck.name);
+            const hasDuplicates = new Set(labels).size !== labels.length;
+            if (hasDuplicates) {
                 return simpleInstrCheck;
             }
-
+            else {
+                allInstr.push(labelCheck);
+                continue;
+            }
         }
-        else {
-            allInstr[instrIndex] = simpleInstrCheck.simpleInstr
-            i = simpleInstrCheck.i
+        //==========================
+
+        let labelInstrCheck = InsIn.labelInstructionProcessing(lines[i], commandsList);
+        if (labelInstrCheck) {
+            labelsFromInstr.push(labelInstrCheck.label);
+            allInstr.push(labelInstrCheck);
+            continue;
+        }
+        //============================
+
+        let singleInstrCheck = InsIn.singleInstructionProcessing(lines[i], commandsList, registersNameList); 
+        if (singleInstrCheck) {
+            allInstr.push(singleInstrCheck);
+            continue; 
         }
 
-        instrIndex++;
+        return simpleInstrCheck; 
+
     }
 
     // console.log(simpleInstr) 

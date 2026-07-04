@@ -1,11 +1,11 @@
 import { Restricts } from "../types/Restricts/Restricts"
 
-export function getRestrists(lab: number, z: number): Restricts | undefined | null {
+export function getRestrists(lab: number, z: number): Restricts | undefined  {
     const labs = [lab1]
     return labs[lab - 1 ](z)
 }
 
-function lab1(z: number): Restricts | null {
+function lab1(z: number): Restricts | undefined {
     switch (z) {
         case 1: {
             return { cmd: ["mov", "shl"], rl: ["ax", "bx"] }
@@ -42,7 +42,7 @@ function lab1(z: number): Restricts | null {
             return lab1(9); 
         }
         default: {
-            return null;
+            return undefined;
         }
     }
 }

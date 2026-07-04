@@ -9,7 +9,7 @@ import mess from "../config/messages.json"
 
 export class InsrtrInspector {
 
-    static singleInstructionProcessing(code: string, commandsList: string[], registersNameList: string[], i: number) {
+    static singleInstructionProcessing(line: string, commandsList: string[], registersNameList: string[]) {
         let singlInstr: SingleInstruction = {
             kind: 'singleInstr',
             cmd: 'none',
@@ -19,7 +19,7 @@ export class InsrtrInspector {
         let singlInstrList = ["inc", "dec"];
 
         for (const instr of singlInstrList) {
-            if (instr === code.slice(i, i + instr.length)) {
+            if (instr === line.slice(0, instr.length)) {
                 singlInstr.cmd = instr as "inc" | "dec";
             }
         }
@@ -32,36 +32,23 @@ export class InsrtrInspector {
             return false;
         }
 
-        i += singlInstr.cmd.length;
-        //console.log(code[i])
-
-        while (code[i] != '\n') {
-            singlInstr.register += code[i];
-
-            i++;
-            if (i >= code.length) {
-                break;
-            }
+        for (let i = singlInstr.cmd.length; i < line.length; i++) {
+            singlInstr.register += line[i];
         }
 
         if (singlInstr.register == '') {
             return false;
         }
-        else if (!registersNameList.includes(singlInstr.register)) {
+
+        if (!registersNameList.includes(singlInstr.register)) {
             return false;
         }
 
-        else {
-            i += 1; // \n
-            return { singlInstr, i }
-        }
-
-        return false;
-
+        return singlInstr
     }
 
 
-    static labelInstructionProcessing(code: string, commandsList: string[], i: number) {
+    static labelInstructionProcessing(line: string, commandsList: string[]) {
         console.log('ys sddf')
         let labelInstr: LabelInstruction = {
             kind: 'lbinstr',
@@ -72,7 +59,7 @@ export class InsrtrInspector {
         let labelInstrList = ["loop", "js", "jns", "jz", "jnz", "jmp"];
 
         for (const instr of labelInstrList) {
-            if (instr === code.slice(i, i + instr.length)) {
+            if (instr === line.slice(0, instr.length)) {
                 labelInstr.cmd = instr as "loop" | "js" | "jns" | "jz" | "jnz" | "jmp";
             }
         }
@@ -85,61 +72,47 @@ export class InsrtrInspector {
             return false;
         }
 
-        i += labelInstr.cmd.length;
-        console.log(code[i])
 
-        while (code[i] != '\n') {
-            labelInstr.label += code[i];
-
-            i++;
-            if (i >= code.length) {
-                break;
-            }
+        for (let i = labelInstr.cmd.length; i < line.length; i++) {
+            labelInstr.label += line[i];
         }
 
         if (labelInstr.label == '') {
             return false;
         }
-        else {
-            i += 1; // \n
-            return { labelInstr, i }
-        }
-
-        return false;
+        return labelInstr;
     }
 
 
-    static labelProcessing(code: string, i: number) {
+    static labelProcessing(line: string) {
 
         let label: Label = {
             kind: 'lb',
             name: ''
         }
 
-        while (code[i] != '\n') {
-            label.name += code[i];
+        for (let i = 0; i < line.length; i++) {
+            label.name += line[i];
 
-            i++;
-            if (i >= code.length) break;
         }
-        i++;
 
         if (RegExp.isEndsWithColon(label.name)) {
             label.name = RegExp.removeEndColon(label.name);
 
             if (label.name !== '') {
-                return { label, i };
+                return label;
             }
         }
 
         return false;
     }
 
-    static simpleInctructionProcessing(code: string,
+    static simpleInctructionProcessing(line: string,
         commandsList: string[],
         registersNameList: string[],
-        i: number,
+        i = 0 
     ) {
+        console.log("line:" + line)
 
         let simpleInstr: SimpleInstruction = {
             kind: 'smplinstr',
@@ -153,9 +126,9 @@ export class InsrtrInspector {
         };
 
         //==================================================
-        const cmd = SIR.commands(i, code, commandsList);
+        const cmd = SIR.commands(i, line, commandsList);
         if (cmd === null) {
-            console.log("ya zdes")
+            //console.log("ya zdes")
             return mess.messages_ru[1];
         }
         else {
@@ -165,7 +138,7 @@ export class InsrtrInspector {
         //==================================================
 
         //==================================================
-        const rg = SIR.registers(i, code, registersNameList);
+        const rg = SIR.registers(i, line, registersNameList);
         if (rg === null) {
             return mess.messages_ru[2];
         }
@@ -176,7 +149,7 @@ export class InsrtrInspector {
         //=================================================
 
         //=================================================
-        if (code[i] === ",") {
+        if (line[i] === ",") {
             i++;
         }
         else {
@@ -187,8 +160,7 @@ export class InsrtrInspector {
 
         // ===============================================
 
-        const value = SIR.value(i, code, code.length);
-        // console.log(value)
+        const value = SIR.value(i, line, line.length);
         if (value.length == 0) {
             return mess.messages_ru[4];
         }
@@ -197,20 +169,11 @@ export class InsrtrInspector {
         if (checkedValue.state === false) {
             return checkedValue.value;
         }
-        console.log(checkedValue)
+        //console.log(checkedValue)
 
         simpleInstr.secondRegister = checkedValue;
 
-        i += simpleInstr.secondRegister.value.length + 1; //('\n')
-
-        if (checkedValue.system === "h") {
-            i += 2; //('0' + 'h')
-        }
-        else if (checkedValue.system === "b") {
-            i += 1; //('b')
-        }
-
         // ==============================================
-        return { simpleInstr, i };
+        return simpleInstr; 
     }
 }

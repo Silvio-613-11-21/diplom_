@@ -26,10 +26,10 @@ export class ControlPanel {
     private runByStepBtn!: HTMLButtonElement;
 
     private instructions: AllInstructions[] | string | null = null;
-    private restricts: Restricts | null | undefined = null;
+    private restricts: Restricts | undefined = undefined;
     private step = 0;
 
-    constructor(App: HTMLElement, editor: Editor, debugger_: Debugger, restricts: Restricts | null | undefined) {
+    constructor(App: HTMLElement, editor: Editor, debugger_: Debugger, restricts: Restricts| undefined) {
         this.editor = editor;
         this.debugger_ = debugger_;
         this.restricts = restricts;
@@ -37,7 +37,7 @@ export class ControlPanel {
         this.init(App);
 
         if (restricts) {
-            this.assembleBtn.addEventListener('click', () => { this.reset(); this.parse(this.editor.content, restricts) })
+            this.assembleBtn.addEventListener('click', () => { this.reset(); this.parse(this.editor.linesArr, restricts) })
             this.runAllBtn.addEventListener('click', () => { this.runEmulate() });
             this.resetBtn.addEventListener('click', () => { this.reset() });
             this.runByStepBtn.addEventListener('click', () => { this.runByStep() });
@@ -52,8 +52,8 @@ export class ControlPanel {
         this.runByStepBtn = document.querySelector(".run-by-step") as HTMLButtonElement;
     }
 
-    private parse(code: string, restricts: Restricts) {
-        let instructions = parser(code, restricts.cmd, restricts.rl);
+    private parse(lines: string[], restricts: Restricts) {
+        let instructions = parser(lines, restricts.cmd, restricts.rl);
         if (typeof instructions == 'string') {
             this.debugger_.consolePrint(instructions);
             this.instructions = null;

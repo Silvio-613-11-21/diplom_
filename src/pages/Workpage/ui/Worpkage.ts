@@ -6,9 +6,9 @@ import { Debugger } from 'src/widgets/Debugger';
 import { ControlPanel } from 'src/widgets/ControlPanel';
 import { RestrictInfo } from 'src/widgets/RestrictInfo';
 
-import { Restricts } from 'src/shared/types/Restricts';
+import { Restricts } from 'src/shared/types/Restricts/Restricts';
 
-export function Workpage(App: HTMLElement, restricts: Restricts | null | undefined) {
+export function Workpage(App: HTMLElement, restricts: Restricts | undefined) {
     
     App.insertAdjacentHTML('beforeend', workspace_html);
 

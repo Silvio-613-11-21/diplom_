@@ -1,25 +1,20 @@
 export
     class RegExp { //потом исправить
 
-    static delComments(code: string) {
-        const regExp = /;.*(?=\n)/g
-        return code.replace(regExp, '')
+    //===============================
+    static lineIsEmpty(line: string): boolean {
+        const isEmpty = /^\s+$/.test(line);
+        return isEmpty || line.length === 0;
     }
 
+    static delComments(line: string) {
+        const regExp = /;.*(?=\n)/g
+        return line.replace(regExp, '')
+    }
+
+    //===============================
     static delSpace(code: string) {
         return code.replace(/[ \t]/g, "");
-    }
-
-    static delLineBreackInStart(code: string) {
-        return code.replace(/^\n+/, "");
-    }
-
-    static unitLineBreack(code: string) {
-        return code.replace(/\n+/g, '\n');
-    }
-
-    static removeEmptyLines(code: string) {
-        return code.replace(/\n\s*\n/g, '\n');
     }
 
     //====================================

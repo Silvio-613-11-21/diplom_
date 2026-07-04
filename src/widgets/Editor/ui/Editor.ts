@@ -23,7 +23,7 @@ export class Editor {
         this.textArea.addEventListener('input', () => {
             if (this.textArea?.childNodes){
                 this.linesArr = linesReader(this.textArea.childNodes); 
-                console.log(this.linesArr)
+                //console.log(this.linesArr)
 
                 //backlights(this.textArea.childNodes ); 
             }
