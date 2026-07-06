@@ -41,4 +41,26 @@ export
     }
 
     //=============================
+
+    static extractSegmentName(input: string): string | false {
+        const regex = /^(.+)segment\.data$/;
+        const match = input.match(regex);
+        if (match) {
+            console.log(match[1])
+            return match[1];
+
+        }
+        return false;
+    }
+
+     static org100hCheck(input: string) {
+        const regex = /^org100h$/;
+        const match = input.match(regex);
+        if (match) {
+            return true; 
+        }
+        return false;
+    }
+
+
 }

@@ -9,16 +9,19 @@ import { linesReader } from "src/widgets/Editor/model/linesReader";
 
 let labels: string[];
 let labelsFromInstr: string[];
-//let codeSrgmentName: string; 
+let codeSegmentName: string;
+let i = 0;
 
 export function parser(lines: string[], commandsList: string[], registersNameList: string[]) {
     labels = [];
     labelsFromInstr = [];
+    i = 0;
 
-    let chLines = linesInit(lines); 
+    let chLines = linesInit(lines);
+    codeSegmentInit(chLines[i]);
+    org100hInit(chLines[i]); 
 
-
-    const res = objTransformer(chLines, commandsList, registersNameList);
+    const res = objTransformer(chLines, commandsList, registersNameList, i);
     //console.log(res)
 
     //console.log(labels);
@@ -31,26 +34,41 @@ export function parser(lines: string[], commandsList: string[], registersNameLis
 }
 
 
-// function codeSegmentInit(){
-
-// }
-
-function linesInit(lines: string[]){
-     lines.forEach((line, i) => { 
-        lines[i] = RegExp.delComments(line)
-        lines[i] = lines[i].toLowerCase();
-    });
-
-    lines.forEach((line, i) => {
-        lines[i] = RegExp.delSpace(line); 
-    })
-
-    let chLines = lines.filter(line => !RegExp.lineIsEmpty(line))
-
-    return chLines; 
+function codeSegmentInit(line: string) {
+    let res = RegExp.extractSegmentName(line);
+    if (res) {
+        i++;
+        codeSegmentName = res;
+        return;
+    }
 }
 
-function objTransformer(lines: string[], commandsList: string[], registersNameList: string[]) {
+function org100hInit(line:string){
+    if ( RegExp.org100hCheck(line)) {
+        i++;
+        return;
+    }
+}
+
+
+function linesInit(lines: string[], i: number = 0) {
+    for (let idx = i; idx < lines.length; idx++) {
+        lines[idx] = RegExp.delComments(lines[idx]);
+        lines[idx] = lines[idx].toLowerCase();
+    }
+
+    for (let idx = i; idx < lines.length; idx++) {
+        lines[idx] = RegExp.delSpace(lines[idx]);
+    }
+    // filter без индекса не может начать с i
+    let chLines = lines.slice(i).filter(line => !RegExp.lineIsEmpty(line));
+    return chLines;
+}
+
+
+
+
+function objTransformer(lines: string[], commandsList: string[], registersNameList: string[], i: number = 0) {
     //let error_ = "unknow err"
 
     let allInstr: AllInstructions[] = [];
@@ -61,8 +79,8 @@ function objTransformer(lines: string[], commandsList: string[], registersNameLi
         return mess.messages_ru[0];
     }
 
-
-    for (let i = 0; i < linesCount; i++) {
+  
+    for (; i < linesCount; i++) {
 
         //============================
         let simpleInstrCheck
@@ -95,23 +113,23 @@ function objTransformer(lines: string[], commandsList: string[], registersNameLi
         }
         //============================
 
-        let singleInstrCheck = InsIn.singleInstructionProcessing(lines[i], commandsList, registersNameList); 
+        let singleInstrCheck = InsIn.singleInstructionProcessing(lines[i], commandsList, registersNameList);
         if (singleInstrCheck) {
             allInstr.push(singleInstrCheck);
-            continue; 
-        }
-
-        //===========================
-
-        let intCheck = InsIn.intCommandProcessing(lines[i]); 
-        if(intCheck){
-            allInstr.push({kind: 'int' , value: intCheck})
             continue;
         }
 
         //===========================
 
-        return simpleInstrCheck; 
+        let intCheck = InsIn.intCommandProcessing(lines[i]);
+        if (intCheck) {
+            allInstr.push({ kind: 'int', value: intCheck })
+            continue;
+        }
+
+        //===========================
+
+        return simpleInstrCheck;
 
     }
 
