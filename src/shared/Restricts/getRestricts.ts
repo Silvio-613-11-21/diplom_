@@ -1,8 +1,8 @@
 import { Restricts } from "../types/Restricts/Restricts"
 
-export function getRestrists(lab: number, z: number): Restricts | undefined  {
-    const labs = [lab1]
-    return labs[lab - 1 ](z)
+export function getRestrists(lab: number, z: number): Restricts | undefined {
+    const labs = [lab1, lab2]
+    return labs[lab - 1](z)
 }
 
 function lab1(z: number): Restricts | undefined {
@@ -34,15 +34,34 @@ function lab1(z: number): Restricts | undefined {
         }
         case 9: {
             return {
-                cmd: ["mov", "cmp", "jmp", "js", "jns", "jz", "jnz",  "add", "sub", "inc", "dec"
+                cmd: ["mov", "cmp", "jmp", "js", "jns", "jz", "jnz", "add", "sub", "inc", "dec"
                 ], rl: ["ax", "bx", "cx", "dx"]
             }
         }
         case 10: {
-            return lab1(9); 
+            return lab1(9);
+        }
+        case -1: {
+            return {
+                cmd: ["mov", "shl", "add", "sub", "and", "shr", "xor", "or", "loop", "inc", "cmp", "jmp", "js", "jns", "jz", "jnz", "dec"],
+                rl: ["ax", "bx", "cx", "dx"]
+            };
         }
         default: {
             return undefined;
         }
     }
 }
+
+
+function lab2(z: number): Restricts | undefined {
+    switch (z) {
+        case (0): {
+            return { cmd: ["call", "ret"], rl: [] }
+        }
+        default: {
+            return undefined; 
+        }
+    }
+}
+

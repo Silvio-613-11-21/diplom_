@@ -129,6 +129,12 @@ function objTransformer(lines: string[], commandsList: string[], registersNameLi
 
         //===========================
 
+        let retCheck = InsIn.retCommandProccessing(lines[i]); 
+        if(retCheck){
+            allInstr.push({kind: 'ret'}); 
+            continue;     
+        }
+
         return simpleInstrCheck;
 
     }

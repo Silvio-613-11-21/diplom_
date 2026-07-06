@@ -13,23 +13,24 @@ import mess from '../config/errors.json'
 export class Emulator {
 
     private static allInsrtr: AllInstructions[];
-
-    public static step: number;
     public static trFl: boolean = false;
-    public static breakFl: boolean = false; 
+    public static breakFl: boolean = false;
+    
+    private static lastCallIndx: number | undefined = undefined;
+    public static step: number;
 
     static emulate(instrs: AllInstructions[], debugger_: Debugger, i: number, NumSys: 2 | 10 | 16 = 16) {
         this.allInsrtr = instrs;
         this.trFl = false;
-        this.breakFl = false; 
+        this.breakFl = false;
 
-        this.cmdSwitcher(instrs[i], debugger_, NumSys);
+        this.cmdSwitcher(instrs[i], debugger_, i, NumSys,);
         debugger_.codeSegment.setStep(i);
 
     }
 
     //=====================================================================================
-    private static cmdSwitcher(instr: AllInstructions, debugger_: Debugger, NumSys: 2 | 10 | 16 ) {
+    private static cmdSwitcher(instr: AllInstructions, debugger_: Debugger, i: number, NumSys: 2 | 10 | 16) {
         if (instr.kind === 'smplinstr') {
             switch (instr.command) {
                 case "mov": {
@@ -501,7 +502,15 @@ export class Emulator {
                     break;
                 }
 
-                // case "none":
+                case "call": {
+                    let label = instr.label;
+                    let step = this.allInsrtr.findIndex(item => item.kind === 'lb' && item.name === label);
+                    this.lastCallIndx = i;
+
+                    this.step = step;
+                    this.trFl = true;
+                    break;
+                }
             }
         }
         else if (instr.kind === 'lb') {
@@ -521,6 +530,19 @@ export class Emulator {
                 }
 
             }
+        }
+        else if (instr.kind === 'ret') {
+            
+            if (this.lastCallIndx === undefined) {
+                debugger_.consolePrint(mess.err_ru.ret_err);
+                this.breakFl = true;
+                return;
+            }
+
+            this.step = this.lastCallIndx;
+            this.step++; 
+            this.trFl = true;
+            return;
         }
 
     }

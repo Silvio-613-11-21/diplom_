@@ -112,6 +112,11 @@ export class CodeSegment {
             res += ' '; 
             res += instr.value; 
         }
+
+        if(instr.kind === 'ret'){
+            res += "ret"; 
+        }
+ 
         //console.log(res)
         return res;
 

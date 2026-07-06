@@ -2,12 +2,21 @@ import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
 import { Label } from "shared/types/ASMcode/Label";
 import { LabelInstruction } from "shared/types/ASMcode/LabelInstruction";
 import { SingleInstruction } from "src/shared/types/ASMcode/SingleInstructio";
+import { Ret } from "src/shared/types/ASMcode/Ret";
 
 import { RegExp } from "./RegExp";
 import { SimpleInstructionsReader as SIR } from "./SimpeInstructionsReader";
 import mess from "../config/messages.json"
 
 export class InsrtrInspector {
+    static retCommandProccessing(line:string){
+        if(line === "ret"){
+            return true;  
+        }
+        else {
+            return false; 
+        }
+    }
 
     static intCommandProcessing(line:string){
         if(line.slice(0,3) === "int"){
@@ -66,7 +75,7 @@ export class InsrtrInspector {
             label: '',
         }
 
-        let labelInstrList = ["loop", "js", "jns", "jz", "jnz", "jmp"];
+        let labelInstrList = ["loop", "js", "jns", "jz", "jnz", "jmp", "call"];
 
         for (const instr of labelInstrList) {
             if (instr === line.slice(0, instr.length)) {
