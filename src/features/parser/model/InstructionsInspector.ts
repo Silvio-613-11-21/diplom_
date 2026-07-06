@@ -9,6 +9,16 @@ import mess from "../config/messages.json"
 
 export class InsrtrInspector {
 
+    static intCommandProcessing(line:string){
+        if(line.slice(0,3) === "int"){
+            let value = line.slice(3); 
+            return value;  
+        }
+        else {
+            return false; 
+        }
+    }
+
     static singleInstructionProcessing(line: string, commandsList: string[], registersNameList: string[]) {
         let singlInstr: SingleInstruction = {
             kind: 'singleInstr',

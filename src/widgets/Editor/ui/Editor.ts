@@ -29,7 +29,7 @@ export class Editor {
             }
         })
 
-        //this.textArea.addEventListener("keydown", (e) => {tabExpection(e, this.textArea as HTMLDivElement);})
+        this.textArea.addEventListener("keydown", (e) => {tabExpection(e, this.textArea as HTMLDivElement);})
     }
 
     private init() {

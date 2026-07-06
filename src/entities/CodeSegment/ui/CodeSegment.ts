@@ -106,6 +106,12 @@ export class CodeSegment {
             res += '    ';
             res += instr.register; 
         }
+
+        if(instr.kind === 'int'){
+            res += 'int'; 
+            res += ' '; 
+            res += instr.value; 
+        }
         //console.log(res)
         return res;
 

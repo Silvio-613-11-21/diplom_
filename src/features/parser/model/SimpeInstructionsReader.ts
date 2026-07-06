@@ -81,8 +81,16 @@ export class SimpleInstructionsReader {
                 case "h": {
                     let hexVal = val.slice(0, -1);
 
-                    console.log(hexVal)
-                    if (hexVal.slice(0, 1) !== "0") {
+                    //console.log(hexVal)
+                    // if (hexVal.slice(0, 1) !== "0") {
+                    //     return {
+                    //         state: false,
+                    //         system: "none",
+                    //         value: mess.messages_ru[6]
+                    //     }
+                    // }
+
+                    if (hexVal.length > 4) {
                         return {
                             state: false,
                             system: "none",
@@ -90,15 +98,7 @@ export class SimpleInstructionsReader {
                         }
                     }
 
-                    if (hexVal.length > 5) {
-                        return {
-                            state: false,
-                            system: "none",
-                            value: mess.messages_ru[6]
-                        }
-                    }
-
-                    hexVal = hexVal.slice(1);
+                    //hexVal = hexVal.slice(1);
                     //console.log(hexVal)
 
                     //console.log(RegExp.isHexadecimalString(hexVal))

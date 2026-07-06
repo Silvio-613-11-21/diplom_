@@ -8,13 +8,13 @@ export
     }
 
     static delComments(line: string) {
-        const regExp = /;.*(?=\n)/g
+        const regExp = /;.*/g
         return line.replace(regExp, '')
     }
 
     //===============================
     static delSpace(code: string) {
-        return code.replace(/[ \t]/g, "");
+        return code.replace(/\s/g, "");
     }
 
     //====================================

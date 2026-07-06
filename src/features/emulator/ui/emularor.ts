@@ -16,10 +16,12 @@ export class Emulator {
 
     public static step: number;
     public static trFl: boolean = false;
+    public static breakFl: boolean = false; 
 
     static emulate(instrs: AllInstructions[], debugger_: Debugger, i: number, NumSys: 2 | 10 | 16 = 16) {
         this.allInsrtr = instrs;
         this.trFl = false;
+        this.breakFl = false; 
 
         this.cmdSwitcher(instrs[i], debugger_, NumSys);
         debugger_.codeSegment.setStep(i);
@@ -27,7 +29,7 @@ export class Emulator {
     }
 
     //=====================================================================================
-    private static cmdSwitcher(instr: AllInstructions, debugger_: Debugger, NumSys: 2 | 10 | 16) {
+    private static cmdSwitcher(instr: AllInstructions, debugger_: Debugger, NumSys: 2 | 10 | 16 ) {
         if (instr.kind === 'smplinstr') {
             switch (instr.command) {
                 case "mov": {
@@ -104,7 +106,8 @@ export class Emulator {
                             console.log(resVal)
 
                             if (resVal.state == false) {
-                                debugger_.consolePrint(mess.errors_ru[0]);
+                                debugger_.consolePrint(mess.err_ru.add_err);
+                                this.breakFl = true;
                                 break;
                             }
 
@@ -115,7 +118,8 @@ export class Emulator {
 
                             if (!overflCheck) {
                                 //console.log('ho')
-                                debugger_.consolePrint(mess.errors_ru[1]);
+                                debugger_.consolePrint(mess.err_ru.overflow_err);
+                                this.breakFl = true;
                                 break;
                             }
 
@@ -144,13 +148,15 @@ export class Emulator {
                             let resVal = cmd.sub(val_1, val_2, NumSys);
 
                             if (resVal.state == false) {
-                                debugger_.consolePrint(mess.errors_ru[0]);
+                                debugger_.consolePrint(mess.err_ru.add_err);
+                                this.breakFl = true;
                                 break;
                             }
 
                             let overflCheck = overflowCheck(resVal.value, NumSys);
                             if (!overflCheck) {
-                                debugger_.consolePrint(mess.errors_ru[1]);
+                                debugger_.consolePrint(mess.err_ru.overflow_err);
+                                this.breakFl = true;
                                 break;
                             }
 
@@ -196,7 +202,8 @@ export class Emulator {
 
 
                             if (resVal.length > 4) {
-                                debugger_.consolePrint(mess.errors_ru[1]);
+                                debugger_.consolePrint(mess.err_ru.overflow_err);
+                                this.breakFl = true;
                                 break;
                             }
 
@@ -236,7 +243,8 @@ export class Emulator {
 
 
                             if (resVal.length > 4) {
-                                debugger_.consolePrint(mess.errors_ru[1]);
+                                debugger_.consolePrint(mess.err_ru.overflow_err);
+                                this.breakFl = true;
                                 break;
                             }
 
@@ -276,7 +284,8 @@ export class Emulator {
 
 
                             if (resVal.length > 4) {
-                                debugger_.consolePrint(mess.errors_ru[1]);
+                                debugger_.consolePrint(mess.err_ru.overflow_err);
+                                this.breakFl = true;
                                 break;
                             }
 
@@ -356,12 +365,14 @@ export class Emulator {
                             //console.log(resVal)
 
                             if (resVal.state == false) {
-                                debugger_.consolePrint(mess.errors_ru[0]);
+                                debugger_.consolePrint(mess.err_ru.add_err);
+                                this.breakFl = true;
                                 break;
                             }
 
                             if (!overflowCheck(resVal.value, NumSys)) {
-                                debugger_.consolePrint(mess.errors_ru[1]);
+                                debugger_.consolePrint(mess.err_ru.overflow_err);
+                                this.breakFl = true;
                                 break;
                             }
 
@@ -386,12 +397,14 @@ export class Emulator {
                             //console.log(resVal)
 
                             if (resVal.state == false) {
-                                debugger_.consolePrint(mess.errors_ru[0]);
+                                debugger_.consolePrint(mess.err_ru.add_err);
+                                this.breakFl = true;
                                 break;
                             }
 
                             if (!overflowCheck(resVal.value, NumSys)) {
-                                debugger_.consolePrint(mess.errors_ru[1]);
+                                debugger_.consolePrint(mess.err_ru.overflow_err);
+                                this.breakFl = true;
                                 break;
                             }
 
@@ -487,12 +500,27 @@ export class Emulator {
                     this.trFl = true;
                     break;
                 }
-                
+
                 // case "none":
             }
         }
         else if (instr.kind === 'lb') {
             return;
+        }
+        else if (instr.kind === 'int') {
+            switch (instr.value) {
+                case '21h': {
+                    debugger_.consolePrint(mess.err_ru.program_end);
+                    this.breakFl = true;
+                    break;
+                }
+                default: {
+                    debugger_.consolePrint(mess.err_ru.unknow_cmd_err);
+                    this.breakFl = true;
+                    break;
+                }
+
+            }
         }
 
     }

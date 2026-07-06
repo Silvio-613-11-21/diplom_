@@ -9,23 +9,14 @@ import { linesReader } from "src/widgets/Editor/model/linesReader";
 
 let labels: string[];
 let labelsFromInstr: string[];
+//let codeSrgmentName: string; 
 
 export function parser(lines: string[], commandsList: string[], registersNameList: string[]) {
     labels = [];
     labelsFromInstr = [];
 
-    
+    let chLines = linesInit(lines); 
 
-    lines.forEach((line, i) => { 
-        lines[i] = RegExp.delComments(line)
-        lines[i] = lines[i].toLowerCase();
-    });
-
-    lines.forEach((line, i) => {
-        lines[i] = RegExp.delSpace(line); 
-    })
-
-    let chLines = lines.filter(line => !RegExp.lineIsEmpty(line))
 
     const res = objTransformer(chLines, commandsList, registersNameList);
     //console.log(res)
@@ -39,6 +30,25 @@ export function parser(lines: string[], commandsList: string[], registersNameLis
     return res;
 }
 
+
+// function codeSegmentInit(){
+
+// }
+
+function linesInit(lines: string[]){
+     lines.forEach((line, i) => { 
+        lines[i] = RegExp.delComments(line)
+        lines[i] = lines[i].toLowerCase();
+    });
+
+    lines.forEach((line, i) => {
+        lines[i] = RegExp.delSpace(line); 
+    })
+
+    let chLines = lines.filter(line => !RegExp.lineIsEmpty(line))
+
+    return chLines; 
+}
 
 function objTransformer(lines: string[], commandsList: string[], registersNameList: string[]) {
     //let error_ = "unknow err"
@@ -90,6 +100,16 @@ function objTransformer(lines: string[], commandsList: string[], registersNameLi
             allInstr.push(singleInstrCheck);
             continue; 
         }
+
+        //===========================
+
+        let intCheck = InsIn.intCommandProcessing(lines[i]); 
+        if(intCheck){
+            allInstr.push({kind: 'int' , value: intCheck})
+            continue;
+        }
+
+        //===========================
 
         return simpleInstrCheck; 
 

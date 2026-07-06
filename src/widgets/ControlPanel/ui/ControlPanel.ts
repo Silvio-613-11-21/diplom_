@@ -29,7 +29,7 @@ export class ControlPanel {
     private restricts: Restricts | undefined = undefined;
     private step = 0;
 
-    constructor(App: HTMLElement, editor: Editor, debugger_: Debugger, restricts: Restricts| undefined) {
+    constructor(App: HTMLElement, editor: Editor, debugger_: Debugger, restricts: Restricts | undefined) {
         this.editor = editor;
         this.debugger_ = debugger_;
         this.restricts = restricts;
@@ -80,16 +80,28 @@ export class ControlPanel {
             let i = 0;
             while (i < this.instructions.length) {
                 em.emulate(this.instructions, this.debugger_, i);
+                if (em.breakFl === true) {
+                    this.debugger_.codeSegment.setStep(i);
+                    this.step = 0;
+                    break;
+                }
+
                 if (em.trFl === false) {
                     i++;
                 }
                 else {
                     i = em.step;
                 }
-
             }
-            this.debugger_.consolePrintS("Конец программы")
-            this.step = 0;
+
+            // if (em.breakFl === true){
+
+            // }
+
+            if (i === this.instructions.length) {
+                this.debugger_.consolePrintS("Конец программы")
+                this.step = 0;
+            }
         }
     }
 
@@ -108,6 +120,12 @@ export class ControlPanel {
             this.debugger_.debbCall();
 
             em.emulate(this.instructions, this.debugger_, this.step);
+
+            if (em.breakFl === true) {
+                this.debugger_.codeSegment.setStep(this.step);
+                return;
+            }
+
             if (em.trFl === false) {
                 this.step++;
             }
@@ -115,22 +133,28 @@ export class ControlPanel {
                 this.step = em.step;
             }
         }
-        else {
-            this.debugger_.consolePrint("Конец программы")
-            this.step = 0;
-            this.debugger_.codeSegment.setStep(this.step);
-        }
+        // else if(this.step === this.instructions.length) {
+        //     this.setEnd();
+        // }
     }
+
+
 
     public setStep(step: number) {
         this.step = step;
     }
 
+    //=========================================
     private reset() {
         this.debugger_.resetAll();
         this.debugger_.codeSegment.reset();
         this.instructions = null;
     }
 
+    private setEnd() {
+        this.debugger_.consolePrint("Конец программы")
+        this.debugger_.codeSegment.setStep(this.step);
+        this.step = 0;
+    }
 
 }
