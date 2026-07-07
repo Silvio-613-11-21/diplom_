@@ -2,13 +2,16 @@ import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
 import { Label } from "shared/types/ASMcode/Label";
 import { LabelInstruction } from "shared/types/ASMcode/LabelInstruction";
 import { SingleInstruction } from "src/shared/types/ASMcode/SingleInstructio";
-import { Ret } from "src/shared/types/ASMcode/Ret";
+import { Macros  } from "src/shared/types/ASMcode/Macros";
 
 import { RegExp } from "./RegExp";
 import { SimpleInstructionsReader as SIR } from "./SimpeInstructionsReader";
 import mess from "../config/messages.json"
 
 export class InsrtrInspector {
+
+
+
     static retCommandProccessing(line:string){
         if(line === "ret"){
             return true;  

@@ -57,7 +57,13 @@ function lab1(z: number): Restricts | undefined {
 function lab2(z: number): Restricts | undefined {
     switch (z) {
         case (0): {
-            return { cmd: ["call", "ret"], rl: [] }
+            return { cmd: ["call", "ret", "%macro"], rl: ["ax", "bx", "cx", "dx"] }
+        }
+        case(-1): {
+            return {
+                cmd: ["call", "ret", "%macro", ...(lab1(-1)?.cmd ?? [])], rl: ["ax", "bx", "cx", "dx"]                
+
+            }
         }
         default: {
             return undefined; 

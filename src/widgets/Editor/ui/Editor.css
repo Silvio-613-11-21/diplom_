@@ -8,7 +8,7 @@
 
 .editor-header {
     display: flex;
-    flex-direction: row ;
+    flex-direction: row;
 
     justify-content: space-between;
     align-items: center;
@@ -25,18 +25,20 @@
 
     border-bottom: 1px solid;
 
-    & .file-name-codeheader{
+    & .file-name-codeheader {
         font-size: larger;
     }
 }
 
-.download-file{
+.download-file {
     border-radius: 7px;
-    border: 1px solid; 
+    border: 1px solid;
 }
 
 
 .text-area {
+    /* display: inline; */
+
     border: none;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -44,11 +46,20 @@
     width: 100%;
     height: calc(100% - 6vh);
     resize: none;
+
+    white-space: nowrap;
     overflow-y: auto;
+    overflow-x: scroll;
     font-size: xx-large;
+}
+
+.text-area > div {
+    min-width: 100%;
+    width: max-content;
+    /* justify-self: stretch; */
+    border-bottom: 1px solid violet;
 }
 
 mo_v {
     color: green;
 }
-
