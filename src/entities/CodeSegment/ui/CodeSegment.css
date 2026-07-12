@@ -1,19 +1,46 @@
-.code-segment{
+.code-segment {
+    display: grid;
+
+    grid-template-columns: 10% auto;
+    grid-template-areas:
+        "ncss lcss";
 
     overflow-y: scroll;
+    border: 1px solid;
+    font-size: xx-large;
 
     min-height: 100%;
     max-height: 100%;
 
     width: 100%;
+}
+
+.line-code-segment-space {
+    grid-area: "lcss";
 
     display: flex;
     flex-direction: column;
 
-    border: 1px solid;
-    font-size: xx-large;
+   
 }
 
-.isActiveLine{
+.num-code-segment-space {
+    grid-area: "ncss";
+    display: flex;
+    flex-direction: column;
+
+    /* border-right: 1px solid; */
+    text-align: center;
+}
+
+.num-code-segment-space>div {
+    height: 30px;
+}
+
+.line-code-segment{
+    height: 30px;
+}
+
+.isActiveLine {
     background-color: blue;
 }

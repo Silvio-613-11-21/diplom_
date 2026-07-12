@@ -11,13 +11,15 @@ export class CodeSegment {
     private instr_s: AllInstructions[] | undefined = undefined;
 
     private lineTpl: HTMLTemplateElement;
-    private codeSegmentElem: HTMLElement;
-
+    private codeSegmentLineSpace: HTMLElement;
+    private codeSegmentNumSpace: HTMLElement;
+    // private codeSegmentElem!: HTMLElement; 
 
     constructor(App: HTMLElement) {
         App.insertAdjacentHTML('afterbegin', html_);
         this.lineTpl = document.querySelector(".tpl-line-code-segment") as HTMLTemplateElement;
-        this.codeSegmentElem = document.querySelector(".code-segment") as HTMLElement;
+        this.codeSegmentLineSpace = document.querySelector(".line-code-segment-space") as HTMLElement;
+        this.codeSegmentNumSpace = document.querySelector(".num-code-segment-space") as HTMLElement;
 
         this.render();
     }
@@ -30,7 +32,9 @@ export class CodeSegment {
     public reset() {
         let lineElemList = document.querySelectorAll('.line-code-segment');
         lineElemList.forEach(line => { line.remove() })
-        this.codeSegmentElem.style.backgroundImage = `url("${imgback}")`;
+
+        this.codeSegmentNumSpace.replaceChildren();
+        this.codeSegmentLineSpace.style.backgroundImage = `url("${imgback}")`;
     }
 
     public setStep(step: number | "last") {
@@ -54,7 +58,7 @@ export class CodeSegment {
         }
         else {
             this.reset();
-            this.codeSegmentElem.style.backgroundImage = `none`;
+            this.codeSegmentLineSpace.style.backgroundImage = `none`;
 
             let i = 0;
             for (const instr of this.instr_s) {
@@ -62,12 +66,16 @@ export class CodeSegment {
                 let lineElem = fragment.firstElementChild as HTMLElement;
                 lineElem.id = `line-${i}`;
                 let p = lineElem.querySelector('pre') as HTMLElement;
-                p.textContent = this.instrParser(instr, i);
+                p.textContent = this.instrParser(instr);
 
-                this.codeSegmentElem.appendChild(lineElem);
+                this.codeSegmentLineSpace.appendChild(lineElem);
 
+                if (i < this.instr_s.length   ) {
+                    this.codeSegmentNumSpace.innerHTML += `<div>${i + 1}</div>`
+                }
                 i++;
             }
+
 
             this.setStep(0);
             return;
@@ -76,8 +84,8 @@ export class CodeSegment {
 
 
     // =====================================================
-    private instrParser(instr: AllInstructions, i: number) {
-        let res = String(i + 1) + '.  ';
+    private instrParser(instr: AllInstructions, i?: number) {
+        let res = '  ';
 
         if (instr.kind == 'smplinstr') {
 
@@ -94,29 +102,29 @@ export class CodeSegment {
         }
 
 
-        if(instr.kind == 'lbinstr') {
+        if (instr.kind == 'lbinstr') {
             res += instr.cmd;
             res += '    ';
-            res += instr.label; 
+            res += instr.label;
         }
 
 
-        if(instr.kind === 'singleInstr'){
+        if (instr.kind === 'singleInstr') {
             res += instr.cmd;
             res += '    ';
-            res += instr.register; 
+            res += instr.register;
         }
 
-        if(instr.kind === 'int'){
-            res += 'int'; 
-            res += ' '; 
-            res += instr.value; 
+        if (instr.kind === 'int') {
+            res += 'int';
+            res += ' ';
+            res += instr.value;
         }
 
-        if(instr.kind === 'ret'){
-            res += "ret"; 
+        if (instr.kind === 'ret') {
+            res += "ret";
         }
- 
+
         //console.log(res)
         return res;
 

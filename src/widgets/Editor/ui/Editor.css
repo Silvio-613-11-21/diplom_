@@ -50,16 +50,19 @@
     white-space: nowrap;
     overflow-y: auto;
     overflow-x: scroll;
-    font-size: xx-large;
+    font-size: 28px;
 }
 
 .text-area > div {
     min-width: 100%;
     width: max-content;
+
+    height: max-content;
+
+    /* height: 30px ; */
     /* justify-self: stretch; */
-    border-bottom: 1px solid violet;
+    color:  saddlebrown;
+
+    /* border-bottom: 1px solid rgb(210, 34, 178); */
 }
 
-mo_v {
-    color: green;
-}

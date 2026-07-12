@@ -28,10 +28,10 @@ export function parser(lines: string[], commandsList: string[], registersNameLis
     Init.org100h(chLines[i]);  //исправить потом
 
     //макрос преобразование 
-    const mcResLines = macrosTransformer(chLines); 
+    const mcResLines = macrosTransformer(chLines);
 
-    if(typeof mcResLines === 'string'){
-        return mcResLines; 
+    if (typeof mcResLines === 'string') {
+        return mcResLines;
     }
     //
 
@@ -57,9 +57,8 @@ function macrosTransformer(lines: string[]) {
         let isMacro = MR.macrostart(lines[i]);
         if (isMacro) {
             let start = i;
-            i++; // переходим на следующую строку после %macro
+            i++;
 
-            // Ищем %endmacro
             let foundEnd = false;
             while (i < lines.length) {
                 if (MR.macroend(lines[i])) {
@@ -73,9 +72,7 @@ function macrosTransformer(lines: string[]) {
                 return mess.err_ru.macroend_err;
             }
 
-            let end = i; // индекс строки с %endmacro
-
-            // Извлекаем строки макроса (между %macro и %endmacro)
+            let end = i;
             let macroLines = lines.slice(start + 1, end);
             if (!macroLines || macroLines.length === 0) {
                 return mess.err_ru.macro_err;
@@ -89,16 +86,12 @@ function macrosTransformer(lines: string[]) {
             MacrosArr.push(macro);
             MacrosNames.push(macro.macroName);
 
-            // Удаляем определение макроса из lines
-            // (start и end включительно)
             lines.splice(start, end - start + 1);
-            // Не увеличиваем i, т.к. splice удалил элементы и 
-            // следующий элемент теперь на позиции start
+
             i = start;
-            continue; // переходим к следующей итерации
+            continue;
         }
 
-        // Проверяем вызов макроса
         if (i < lines.length) {
             let isMacroCall = MR.macroCall(lines[i], MacrosNames);
             if (isMacroCall) {
@@ -112,7 +105,7 @@ function macrosTransformer(lines: string[]) {
                     return mess.err_ru.macroParamCount_err;
                 }
 
-                // Генерируем новые строки с подставленными параметрами
+
                 let newLines: string[] = [];
                 for (let lineIdx = 0; lineIdx < macro.lines.length; lineIdx++) {
                     let newLine = macro.lines[lineIdx];
@@ -122,10 +115,9 @@ function macrosTransformer(lines: string[]) {
                     newLines.push(newLine);
                 }
 
-                // Заменяем строку с вызовом макроса на newLines
+
                 lines.splice(i, 1, ...newLines);
-                
-                // Перемещаем i на следующую позицию после вставленных строк
+
                 i += newLines.length;
                 continue;
             }

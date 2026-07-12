@@ -57,17 +57,46 @@ function lab1(z: number): Restricts | undefined {
 function lab2(z: number): Restricts | undefined {
     switch (z) {
         case (0): {
-            return { cmd: ["call", "ret", "%macro"], rl: ["ax", "bx", "cx", "dx"] }
+            return { cmd: ["call", "ret", "%macro", "mov"], rl: ["ax", "bx", "cx", "dx"] }
         }
-        case(-1): {
-            return {
-                cmd: ["call", "ret", "%macro", ...(lab1(-1)?.cmd ?? [])], rl: ["ax", "bx", "cx", "dx"]                
+        case 1: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(1)?.cmd ?? [])], rl: [...lab1(1)?.rl ?? []] }
+        }
 
+        case 2: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(2)?.cmd ?? [])], rl: [...lab1(2)?.rl ?? []] }
+        }
+        case 3: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(3)?.cmd ?? [])], rl: [...lab1(3)?.rl ?? []] }
+        }
+        case 4: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(4)?.cmd ?? [])], rl: [...lab1(4)?.rl ?? []] }
+        }
+        case 5: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(5)?.cmd ?? [])], rl: [...lab1(5)?.rl ?? []] }
+        }
+        case 6: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(6)?.cmd ?? [])], rl: [...lab1(6)?.rl ?? []] }
+        }
+        case 7: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(7)?.cmd ?? [])], rl: [...lab1(7)?.rl ?? []] }
+        }
+        case 8: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(8)?.cmd ?? [])], rl: [...lab1(8)?.rl ?? []] }
+        }
+        case 9: {
+            return { cmd: ["call", "ret", "%macro", ...(lab1(9)?.cmd ?? [])], rl: [...lab1(9)?.rl ?? []] }
+        }
+        case 10: {
+            return lab2(9);
+        }
+        case (-1): {
+            return {
+                cmd: ["call", "ret", "%macro", ...(lab1(-1)?.cmd ?? [])], rl: ["ax", "bx", "cx", "dx"]
             }
         }
         default: {
-            return undefined; 
+            return undefined;
         }
     }
 }
-
