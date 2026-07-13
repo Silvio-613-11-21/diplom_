@@ -11,16 +11,15 @@ import { MacrosReader as MR } from "./model/MacrosReader";
 
 let labels: string[];
 let labelsFromInstr: string[];
-//let macrosArr: string[];
 
 let codeSegmentName: string;
 let i = 0;
 
-export function parser(lines: string[], commandsList: string[], registersNameList: string[]) {
+export function parser(lines: string[], labNum: number | undefined, commandsList: string[], registersNameList: string[]) {
     labels = [];
     labelsFromInstr = [];
     i = 0;
-    //macrosArr = [];
+
 
 
     let chLines = Init.lines(lines);
@@ -28,15 +27,25 @@ export function parser(lines: string[], commandsList: string[], registersNameLis
     Init.org100h(chLines[i]);  //исправить потом
 
     //макрос преобразование 
-    const mcResLines = macrosTransformer(chLines);
+    if (labNum != undefined && labNum >= 2) {
+        const mcResLines = macrosTransformer(chLines);
 
-    if (typeof mcResLines === 'string') {
-        return mcResLines;
+        if (typeof mcResLines === 'string') {
+            return mcResLines;
+        }
+        else{
+            chLines = mcResLines; 
+        }
     }
     //
 
+    //
+    if(labNum != undefined && labNum >= 3){
+        
+    }
 
-    const res = objTransformer(mcResLines, commandsList, registersNameList, i);
+
+    const res = objTransformer(chLines, commandsList, registersNameList, i);
     //console.log(res)
 
     //console.log(labels);

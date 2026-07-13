@@ -53,7 +53,7 @@ export class ControlPanel {
     }
 
     private parse(lines: string[], restricts: Restricts) {
-        let instructions = parser(lines, restricts.cmd, restricts.rl);
+        let instructions = parser(lines, restricts.lab, restricts.cmd, restricts.rl);
         if (typeof instructions == 'string') {
             this.debugger_.consolePrint(instructions);
             this.instructions = null;
