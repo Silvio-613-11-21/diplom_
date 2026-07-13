@@ -7,6 +7,7 @@ import html from './Debugger.html?raw'
 import { Registers } from "src/entities/Registers";
 import { FlagRegisters } from 'src/entities/FlagRegister';
 import { CodeSegment } from 'src/entities/CodeSegment';
+import { DataSegment  } from 'src/entities/DataSegment';
 
 
 export class Debugger {
@@ -14,6 +15,7 @@ export class Debugger {
     public reg!: Registers
     public flagReg!: FlagRegisters;
     public codeSegment!: CodeSegment;  
+    public dataSegment!: DataSegment; 
 
     // =======================================
 
@@ -34,11 +36,13 @@ export class Debugger {
 
         const registersSpace = document.querySelector(".registers-space") as HTMLElement;
         const flagRegistersSpace = document.querySelector(".flag-registers-space") as HTMLElement;
-        const codeSegmentSpace = document.querySelector(".code-segment-space") as HTMLElement;  
+        const codeSegmentSpace = document.querySelector(".code-segment-space") as HTMLElement; 
+        const dataSegmentSpace = document.querySelector(".data-segment-space") as HTMLElement; 
 
         this.reg = new Registers(registersSpace);
         this.flagReg = new FlagRegisters(flagRegistersSpace);
         this.codeSegment = new CodeSegment(codeSegmentSpace); 
+        this.dataSegment = new DataSegment(dataSegmentSpace); 
 
         this.debSwBtn = document.querySelector(".debbuder-switch-btn") as HTMLButtonElement;
         this.consSwBtn = document.querySelector(".console-switch-btn") as HTMLButtonElement;

@@ -87,7 +87,8 @@
         grid-template-columns: auto 45%;
         grid-template-areas:
             "c-s-sp r-sp"
-            "c-s-sp f-r-sp";
+            "c-s-sp f-r-sp"
+            "d-s-sp f-r-sp";
         gap: 10px;
 
     }
