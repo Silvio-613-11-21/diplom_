@@ -1,12 +1,15 @@
 
 import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 
-import { RegExp } from "./model/RegExp";
-import { InsrtrInspector as InsIn } from "./model/InstructionsInspector";
+import { RegExp } from "./model/RegExp/RegExp";
+import { InsrtrInspector as InsIn } from "./model/OTHelpers/InstructionsInspector"
+
+
+import { Macros } from "src/shared/types/ASMcode/Macros";
+import { MacrosReader as MR } from "./model/MTHelpers/MacrosReader";
 
 import mess from "./config/messages.json"
-import { Macros } from "src/shared/types/ASMcode/Macros";
-import { MacrosReader as MR } from "./model/MacrosReader";
+
 
 
 let labels: string[];
@@ -56,6 +59,24 @@ export function parser(lines: string[], labNum: number | undefined, commandsList
 
     return res;
 }
+
+// ===========================================
+
+function byteWordIndexTransformer(lines: string[]) {
+    for (let i = 0; i < lines.length; i++) {
+        // Регулярное выражение для поиска byte[] или word[] и захвата содержимого внутри скобок
+        const match = lines[i].match(/(?:byte|word)\[([^\]]*)\]/);
+        
+        if (match) {
+            // match[1] содержит содержимое внутри скобок
+            console.log(`Строка ${i + 1}: ${match[1]}`);
+        }
+    }
+}
+
+
+
+//============================================
 
 function macrosTransformer(lines: string[]) {
     let MacrosArr: Macros[] = [];
@@ -139,6 +160,8 @@ function macrosTransformer(lines: string[]) {
 }
 
 
+// ======================================
+
 function objTransformer(lines: string[], commandsList: string[], registersNameList: string[], i: number = 0) {
     //let error_ = "unknow err"
 
@@ -215,11 +238,14 @@ function objTransformer(lines: string[], commandsList: string[], registersNameLi
     return allInstr;
 }
 
+//====================================
+
 function labelsCheck(labels: string[], labelsFromInstr: string[]): boolean {
     const labelSet = new Set(labels);
     return labelsFromInstr.every(label => labelSet.has(label));
 }
 
+// =====================================
 
 class Init {
     static codeSegment(line: string) {
@@ -253,3 +279,5 @@ class Init {
         return chLines;
     }
 }
+
+//======================

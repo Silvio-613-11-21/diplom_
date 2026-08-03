@@ -6,9 +6,19 @@
 import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 import { Macros } from "src/shared/types/ASMcode/Macros";
 
-import { RegExp } from "./RegExp";
-import { SimpleInstructionsReader, SimpleInstructionsReader as SIR } from "./SimpeInstructionsReader";
-import mess from "../config/messages.json"
+// import { RegExp } from "./RegExp";
+import { SimpleInstructionsReader as SIR } from "./SimpeInstructionsReader";
+import mess from "../../config/messages.json"
+
+class RegExp {
+    static isEndsWithColon(str: string) {
+        return /:$/.test(str);
+    }
+
+    static removeEndColon(str: string) {
+        return str.replace(/:$/, '');
+    }
+}
 
 export class InsrtrInspector {
 
@@ -68,7 +78,7 @@ export class InsrtrInspector {
             kind: 'singleInstr',
             cmd: cmd,
             register: register
-        } as AllInstructions; 
+        } as AllInstructions;
 
     }
 
@@ -105,7 +115,7 @@ export class InsrtrInspector {
             kind: 'lbinstr',
             cmd: cmd,
             label: label,
-        } as AllInstructions; 
+        } as AllInstructions;
     }
 
 
@@ -128,7 +138,7 @@ export class InsrtrInspector {
                 return {
                     kind: 'lb',
                     name: name
-                } as AllInstructions; 
+                } as AllInstructions;
             }
         }
 
@@ -192,6 +202,6 @@ export class InsrtrInspector {
             command: cmd,
             register: rg,
             secondRegister: checkedValue
-        } as  AllInstructions ; 
+        } as AllInstructions;
     }
 }

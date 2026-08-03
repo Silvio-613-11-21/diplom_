@@ -17,29 +17,9 @@ export
         return code.replace(/\s/g, "");
     }
 
-    //====================================
-    static isBinaryString(str: string) {
-        return /^[01]+$/.test(str);
-    }
+   
 
-    static isHexadecimalString(str: string) {
-        return /^[0-9a-f]+$/.test(str);
-    }
-
-    static isDecimalString(str: string) {
-        return /^[+-]?[0-9]+$/.test(str);
-    }
-
-    //=================================
-
-    static isEndsWithColon(str: string) {
-        return /:$/.test(str);
-    }
-
-    static removeEndColon(str: string) {
-        return str.replace(/:$/, '');
-    }
-
+   
     //=============================
 
     static extractSegmentName(input: string): string | false {
@@ -61,6 +41,7 @@ export
         }
         return false;
     }
+
 
 
 }

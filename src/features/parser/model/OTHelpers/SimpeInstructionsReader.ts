@@ -1,6 +1,24 @@
-import { ResgisterValue } from "src/shared/types/ASMcode/RegisterValue";
-import mess from "../config/messages.json"
-import { RegExp } from "./RegExp";
+import { VariableValue } from "src/shared/types/ASMcode/VariableValue";
+
+import mess from "../../config/messages.json"
+
+
+class RegExp {
+     //====================================
+    static isBinaryString(str: string) {
+        return /^[01]+$/.test(str);
+    }
+
+    static isHexadecimalString(str: string) {
+        return /^[0-9a-f]+$/.test(str);
+    }
+
+    static isDecimalString(str: string) {
+        return /^[+-]?[0-9]+$/.test(str);
+    }
+
+    //=================================
+}
 
 export class SimpleInstructionsReader {
 
@@ -36,7 +54,7 @@ export class SimpleInstructionsReader {
         return val;
     }
 
-    static checkValue(val: string, currentCmd: string, registersNameList: string[]): ResgisterValue {
+    static checkValue(val: string, currentCmd: string, registersNameList: string[]): VariableValue {
 
         if (currentCmd === "shl" || currentCmd === "shr") {
             if (RegExp.isDecimalString(val)) {

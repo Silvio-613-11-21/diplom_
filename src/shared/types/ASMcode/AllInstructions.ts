@@ -4,7 +4,7 @@
 //import { SingleInstruction } from "./SingleInstructio";
 //import { Int } from "./IntInstruction";
 //import { Ret } from "./Ret";
-import { ResgisterValue } from "./RegisterValue";
+import { VariableValue } from "./VariableValue";
 
 export type AllInstructions = SimpleInstruction | Label | LabelInstruction | SingleInstruction | Int | Ret | Word | Byte;
 
@@ -13,6 +13,7 @@ export type AllInstructions = SimpleInstruction | Label | LabelInstruction | Sin
 type ByteWord<K> = {
     kind: K,
     indexVal: string;
+
 }
 
 type Word = ByteWord<'word'>
@@ -39,7 +40,7 @@ interface SimpleInstruction {
     kind: "smplinstr";
     command: string;
     register: string;
-    secondRegister: ResgisterValue;
+    secondRegister: VariableValue;
 }
 
 interface LabelInstruction {
