@@ -33,15 +33,15 @@ export function parser(lines: string[], labNum: number | undefined, commandsList
         if (typeof mcResLines === 'string') {
             return mcResLines;
         }
-        else{
-            chLines = mcResLines; 
+        else {
+            chLines = mcResLines;
         }
     }
     //
 
     //
-    if(labNum != undefined && labNum >= 3){
-        
+    if (labNum != undefined && labNum >= 3) {
+
     }
 
 
@@ -163,7 +163,7 @@ function objTransformer(lines: string[], commandsList: string[], registersNameLi
         //===========================
 
         let labelCheck = InsIn.labelProcessing(lines[i]);
-        if (labelCheck) {
+        if (labelCheck && labelCheck.kind === 'lb') {
             labels.push(labelCheck.name);
             const hasDuplicates = new Set(labels).size !== labels.length;
             if (hasDuplicates) {
@@ -173,11 +173,12 @@ function objTransformer(lines: string[], commandsList: string[], registersNameLi
                 allInstr.push(labelCheck);
                 continue;
             }
+
         }
         //==========================
 
         let labelInstrCheck = InsIn.labelInstructionProcessing(lines[i], commandsList);
-        if (labelInstrCheck) {
+        if (labelInstrCheck && labelInstrCheck.kind === 'lbinstr') {
             labelsFromInstr.push(labelInstrCheck.label);
             allInstr.push(labelInstrCheck);
             continue;

@@ -1,7 +1,8 @@
 .code-segment-space {
     grid-area: c-s-sp;
-    max-height: 50vh;
-    min-height: 50vh;
+    /* max-height: 50vh;
+    min-height: 50vh; */
+    height: 100%;
     width: 100%;
 }
 

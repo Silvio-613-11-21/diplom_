@@ -1,9 +1,10 @@
 import { Commands as cmd } from "../model/commands/commands";
 import { Convertor as cv } from "../model/сonvertor/convertor";
 
-import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
-import { Label } from "shared/types/ASMcode/Label";
-import { LabelInstruction } from "src/shared/types/ASMcode/LabelInstruction";
+// import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
+// import { Label } from "shared/types/ASMcode/Label";
+// import { LabelInstruction } from "src/shared/types/ASMcode/LabelInstruction";
+
 import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 
 import { Debugger } from 'src/widgets/Debugger';
@@ -15,7 +16,7 @@ export class Emulator {
     private static allInsrtr: AllInstructions[];
     public static trFl: boolean = false;
     public static breakFl: boolean = false;
-    
+
     private static lastCallIndx: number | undefined = undefined;
     public static step: number;
 
@@ -532,7 +533,7 @@ export class Emulator {
             }
         }
         else if (instr.kind === 'ret') {
-            
+
             if (this.lastCallIndx === undefined) {
                 debugger_.consolePrint(mess.err_ru.ret_err);
                 this.breakFl = true;
@@ -540,7 +541,7 @@ export class Emulator {
             }
 
             this.step = this.lastCallIndx;
-            this.step++; 
+            this.step++;
             this.trFl = true;
             return;
         }
@@ -551,27 +552,29 @@ export class Emulator {
 
 
 
-function normalizationValueSystem(instr: SimpleInstruction, to: 2 | 10 | 16) {
+function normalizationValueSystem(instr: AllInstructions, to: 2 | 10 | 16) {
+    if (instr.kind === 'smplinstr') {
 
-    if (instr.secondRegister.system === 'h') {
-        let val = cv.convert(instr.secondRegister.value, 16, to);
-        return val;
-    }
-
-    if (instr.secondRegister.system === "b") {
-        let val = cv.convert(instr.secondRegister.value, 2, to);
-        return val;
-    }
-    else if (instr.secondRegister.system === "d") {
-        let valNum = parseInt(instr.secondRegister.value);
-
-        if (valNum >= 0) {
-            let val = cv.convert(instr.secondRegister.value, 10, to);
+        if (instr.secondRegister.system === 'h') {
+            let val = cv.convert(instr.secondRegister.value, 16, to);
             return val;
         }
-        else {
-            let val = cv.negativeNumberTransform(valNum);
+
+        if (instr.secondRegister.system === "b") {
+            let val = cv.convert(instr.secondRegister.value, 2, to);
             return val;
+        }
+        else if (instr.secondRegister.system === "d") {
+            let valNum = parseInt(instr.secondRegister.value);
+
+            if (valNum >= 0) {
+                let val = cv.convert(instr.secondRegister.value, 10, to);
+                return val;
+            }
+            else {
+                let val = cv.negativeNumberTransform(valNum);
+                return val;
+            }
         }
     }
 

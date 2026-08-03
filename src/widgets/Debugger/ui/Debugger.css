@@ -5,7 +5,7 @@
     border-radius: 10px;
 
     min-width: 100%;
-    min-height: 50%;
+    min-height: 100%;
 
     /* width: auto; */
 }
@@ -83,8 +83,8 @@
         width: 100%;
 
         display: grid;
-        grid-template-rows: auto 1fr;
-        grid-template-columns: auto 45%;
+        grid-template-rows: 30% 1fr;
+        grid-template-columns: auto auto;
         grid-template-areas:
             "c-s-sp r-sp"
             "c-s-sp f-r-sp"

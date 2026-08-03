@@ -1,128 +1,134 @@
-import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
-import { Label } from "shared/types/ASMcode/Label";
-import { LabelInstruction } from "shared/types/ASMcode/LabelInstruction";
-import { SingleInstruction } from "src/shared/types/ASMcode/SingleInstructio";
-import { Macros  } from "src/shared/types/ASMcode/Macros";
+// import { SimpleInstruction } from "shared/types/ASMcode/SimpleInstruction";
+// import { Label } from "shared/types/ASMcode/Label";
+// import { LabelInstruction } from "shared/types/ASMcode/LabelInstruction";
+// import { SingleInstruction } from "src/shared/types/ASMcode/SingleInstructio";
+
+import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
+import { Macros } from "src/shared/types/ASMcode/Macros";
 
 import { RegExp } from "./RegExp";
-import { SimpleInstructionsReader as SIR } from "./SimpeInstructionsReader";
+import { SimpleInstructionsReader, SimpleInstructionsReader as SIR } from "./SimpeInstructionsReader";
 import mess from "../config/messages.json"
 
 export class InsrtrInspector {
 
-
-
-    static retCommandProccessing(line:string){
-        if(line === "ret"){
-            return true;  
+    static retCommandProccessing(line: string) {
+        if (line === "ret") {
+            return true;
         }
         else {
-            return false; 
+            return false;
         }
     }
 
-    static intCommandProcessing(line:string){
-        if(line.slice(0,3) === "int"){
-            let value = line.slice(3); 
-            return value;  
+    static intCommandProcessing(line: string) {
+        if (line.slice(0, 3) === "int") {
+            let value = line.slice(3);
+            return value;
         }
         else {
-            return false; 
+            return false;
         }
     }
 
     static singleInstructionProcessing(line: string, commandsList: string[], registersNameList: string[]) {
-        let singlInstr: SingleInstruction = {
-            kind: 'singleInstr',
-            cmd: 'none',
-            register: ''
-        }
 
         let singlInstrList = ["inc", "dec"];
+        let cmd;
 
         for (const instr of singlInstrList) {
             if (instr === line.slice(0, instr.length)) {
-                singlInstr.cmd = instr as "inc" | "dec";
+                cmd = instr as "inc" | "dec";
+                break;
             }
         }
 
-        if (singlInstr.cmd === 'none') {
+        if (!cmd) {
             return false;
         }
 
-        if (!commandsList.includes(singlInstr.cmd)) {
+        if (!commandsList.includes(cmd)) {
             return false;
         }
 
-        for (let i = singlInstr.cmd.length; i < line.length; i++) {
-            singlInstr.register += line[i];
+        let register = '';
+        for (let i = cmd.length; i < line.length; i++) {
+            register += line[i];
         }
 
-        if (singlInstr.register == '') {
+        if (register == '') {
             return false;
         }
 
-        if (!registersNameList.includes(singlInstr.register)) {
+        if (!registersNameList.includes(register)) {
             return false;
         }
 
-        return singlInstr
+        return {
+            kind: 'singleInstr',
+            cmd: cmd,
+            register: register
+        } as AllInstructions; 
+
     }
 
-
     static labelInstructionProcessing(line: string, commandsList: string[]) {
-        console.log('ys sddf')
-        let labelInstr: LabelInstruction = {
-            kind: 'lbinstr',
-            cmd: 'none',
-            label: '',
-        }
+        // console.log('ys sddf')
 
         let labelInstrList = ["loop", "js", "jns", "jz", "jnz", "jmp", "call"];
 
+        let cmd;
         for (const instr of labelInstrList) {
             if (instr === line.slice(0, instr.length)) {
-                labelInstr.cmd = instr as "loop" | "js" | "jns" | "jz" | "jnz" | "jmp";
+                cmd = instr as "loop" | "js" | "jns" | "jz" | "jnz" | "jmp";
             }
         }
 
-        if (labelInstr.cmd === 'none') {
+        if (!cmd) {
             return false;
         }
 
-        if (!commandsList.includes(labelInstr.cmd)) {
+        if (!commandsList.includes(cmd)) {
             return false;
         }
 
-
-        for (let i = labelInstr.cmd.length; i < line.length; i++) {
-            labelInstr.label += line[i];
+        let label = '';
+        for (let i = cmd.length; i < line.length; i++) {
+            label += line[i];
         }
 
-        if (labelInstr.label == '') {
+        if (label == '') {
             return false;
         }
-        return labelInstr;
+
+        return {
+            kind: 'lbinstr',
+            cmd: cmd,
+            label: label,
+        } as AllInstructions; 
     }
 
 
     static labelProcessing(line: string) {
 
-        let label: Label = {
-            kind: 'lb',
-            name: ''
-        }
+        // let label: AllInstructions = {
+        //     kind: 'lb',
+        //     name: ''
+        // }
 
+        let name = '';
         for (let i = 0; i < line.length; i++) {
-            label.name += line[i];
-
+            name += line[i];
         }
 
-        if (RegExp.isEndsWithColon(label.name)) {
-            label.name = RegExp.removeEndColon(label.name);
+        if (RegExp.isEndsWithColon(name)) {
+            name = RegExp.removeEndColon(name);
 
-            if (label.name !== '') {
-                return label;
+            if (name !== '') {
+                return {
+                    kind: 'lb',
+                    name: name
+                } as AllInstructions; 
             }
         }
 
@@ -132,20 +138,9 @@ export class InsrtrInspector {
     static simpleInctructionProcessing(line: string,
         commandsList: string[],
         registersNameList: string[],
-        i = 0 
+        i = 0
     ) {
         console.log("line:" + line)
-
-        let simpleInstr: SimpleInstruction = {
-            kind: 'smplinstr',
-            command: "",
-            register: "",
-            secondRegister: {
-                state: false,
-                system: 'none',
-                value: ""
-            }
-        };
 
         //==================================================
         const cmd = SIR.commands(i, line, commandsList);
@@ -155,7 +150,6 @@ export class InsrtrInspector {
         }
         else {
             i += cmd.length;
-            simpleInstr.command = cmd
         }
         //==================================================
 
@@ -166,7 +160,6 @@ export class InsrtrInspector {
         }
         else {
             i += rg.length;
-            simpleInstr.register = rg;
         }
         //=================================================
 
@@ -193,9 +186,12 @@ export class InsrtrInspector {
         }
         //console.log(checkedValue)
 
-        simpleInstr.secondRegister = checkedValue;
-
         // ==============================================
-        return simpleInstr; 
+        return {
+            kind: 'smplinstr',
+            command: cmd,
+            register: rg,
+            secondRegister: checkedValue
+        } as  AllInstructions ; 
     }
 }

@@ -18,3 +18,9 @@ export function setRestricts(): Restricts | undefined{
 
     return getRestrists(lab,z); 
 }
+
+export function getCode(){
+    let textArea = document.getElementById("textArea") as HTMLDivElement; 
+
+    return textArea.textContent; 
+}

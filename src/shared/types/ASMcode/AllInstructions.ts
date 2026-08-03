@@ -8,16 +8,19 @@ import { ResgisterValue } from "./RegisterValue";
 
 export type AllInstructions = SimpleInstruction | Label | LabelInstruction | SingleInstruction | Int | Ret | Word | Byte;
 
-interface Word {
-    kind: 'word';  
+// ================
+
+type ByteWord<K> = {
+    kind: K,
     indexVal: string;
 }
 
-interface Byte{
-    kind: 'byte';  
-    indexVal: string;
-}
+type Word = ByteWord<'word'>
+type Byte = ByteWord<'byte'>
 
+// ==================
+
+// ============
 interface Int {
     kind: 'int';
     value: string;
@@ -27,10 +30,9 @@ interface Label {
     kind: 'lb';
     name: string;
 }
+//========
 
-interface Ret {
-    kind: 'ret';
-}
+type Ret =  {kind: 'ret';}
 
 
 interface SimpleInstruction {
@@ -40,14 +42,14 @@ interface SimpleInstruction {
     secondRegister: ResgisterValue;
 }
 
-interface LabelInstruction{
+interface LabelInstruction {
     kind: "lbinstr";
-    cmd: "loop" | "js" | "jns" | "jz" | "jnz" | "jmp" | "call" |  "none";
-    label: string; 
+    cmd: "loop" | "js" | "jns" | "jz" | "jnz" | "jmp" | "call" | "none";
+    label: string;
 }
 
 interface SingleInstruction {
-    kind: "singleInstr"; 
-    cmd: "inc" | "dec" | "none"; 
-    register: string; 
+    kind: "singleInstr";
+    cmd: "inc" | "dec" | "none";
+    register: string;
 }
