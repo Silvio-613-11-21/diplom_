@@ -164,12 +164,20 @@ export class InsrtrInspector {
         //==================================================
 
         //==================================================
+        let rgBw; 
         const rg = SIR.registers(i, line, registersNameList);
-        if (rg === null) {
+        const bw = SIR.byteWord(i, line)
+
+        if (rg === null && bw === null) {
             return mess.messages_ru[2];
         }
-        else {
+        else if(rg){
             i += rg.length;
+            rgBw = rg; 
+        }
+        else if(bw){
+            i += 6 + bw.idx.length; 
+            rgBw = bw.cmd; 
         }
         //=================================================
 
@@ -200,8 +208,13 @@ export class InsrtrInspector {
         return {
             kind: 'smplinstr',
             command: cmd,
-            register: rg,
-            secondRegister: checkedValue
+            register: rgBw,
+            secondRegister: checkedValue,
+            index: bw?.idx,
         } as AllInstructions;
     }
+
+
+
+    
 }

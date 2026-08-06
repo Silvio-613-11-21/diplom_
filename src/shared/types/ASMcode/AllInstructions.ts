@@ -6,20 +6,30 @@
 //import { Ret } from "./Ret";
 import { VariableValue } from "./VariableValue";
 
-export type AllInstructions = SimpleInstruction | Label | LabelInstruction | SingleInstruction | Int | Ret | Word | Byte;
+export type AllInstructions = SimpleInstruction | Label | LabelInstruction | SingleInstruction | Int | Ret | WordInstr | ByteInstr;
 
 // ================
 
-type ByteWord<K> = {
-    kind: K,
+type ByteWordInstr<K> = {
+    command: string;
+    kind: K; 
     indexVal: string;
-
+    asciiStr: string; 
 }
 
-type Word = ByteWord<'word'>
-type Byte = ByteWord<'byte'>
+type WordInstr = ByteWordInstr<'word'>
+type ByteInstr = ByteWordInstr<'byte'>
 
 // ==================
+
+interface SimpleInstruction {
+    kind: "smplinstr";
+    command: string;
+    register: string | 'byte' | 'word';
+    index?: string; 
+    secondRegister: VariableValue;
+}
+
 
 // ============
 interface Int {
@@ -35,13 +45,6 @@ interface Label {
 
 type Ret =  {kind: 'ret';}
 
-
-interface SimpleInstruction {
-    kind: "smplinstr";
-    command: string;
-    register: string;
-    secondRegister: VariableValue;
-}
 
 interface LabelInstruction {
     kind: "lbinstr";

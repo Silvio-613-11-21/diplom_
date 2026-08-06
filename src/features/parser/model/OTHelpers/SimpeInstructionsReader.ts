@@ -4,7 +4,7 @@ import mess from "../../config/messages.json"
 
 
 class RegExp {
-     //====================================
+    //====================================
     static isBinaryString(str: string) {
         return /^[01]+$/.test(str);
     }
@@ -31,6 +31,17 @@ export class SimpleInstructionsReader {
         }
         return null;
     }
+
+    static byteWord(index: number, code: string): { cmd: string, idx: string } | null {
+
+        code = code.slice(index);
+        const match = code.match(/(byte|word)\[([^\]]*)\]/);
+        if (match) {
+            return { cmd: match[1], idx: match[2] }
+        }
+        return null;
+    }
+
 
     static commands(index: number, code: string, comamndsList: string[]): string | null {
         for (let i = 0; i < comamndsList.length; i++) {
@@ -177,6 +188,34 @@ export class SimpleInstructionsReader {
                 }
 
             }
+
+            let match = val.match(/(byte|word)\[([^\]]*)\]/)
+            if (match) {
+                let sys: 'word' | 'byte'
+                if (match[1] === 'byte') {
+                    sys = 'byte';
+                }
+                else {
+                    sys = 'word';
+                }
+
+                return {
+                    state: true,
+                    system: sys,
+                    value: match[0],
+                    index: match[2]
+                }
+            }
+
+            let str = val.match(/^'(.*)'$/);
+            if (str) {
+                return {
+                    state: true,
+                    system: 'str', 
+                    value: str[1]
+                }
+            }
+
         }
 
         return {

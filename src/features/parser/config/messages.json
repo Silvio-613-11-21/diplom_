@@ -2,7 +2,9 @@
     "err_ru": {
         "macroend_err": "У макроса нет конца", 
         "macro_err": "Ошибка в макросе",
-        "macroParamCount_err": "Ошибка в числе параметров"
+        "macroParamCount_err": "Ошибка в числе параметров",
+        "index_err": "Ошибка в индексе"
+
     },
 
     "messages_ru": [

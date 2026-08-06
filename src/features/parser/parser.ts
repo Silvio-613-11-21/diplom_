@@ -3,7 +3,7 @@ import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
 
 import { RegExp } from "./model/RegExp/RegExp";
 import { InsrtrInspector as InsIn } from "./model/OTHelpers/InstructionsInspector"
-
+import { idxResv } from "./model/BTHelpers/IndexResolve";
 
 import { Macros } from "src/shared/types/ASMcode/Macros";
 import { MacrosReader as MR } from "./model/MTHelpers/MacrosReader";
@@ -44,11 +44,18 @@ export function parser(lines: string[], labNum: number | undefined, commandsList
 
     //
     if (labNum != undefined && labNum >= 3) {
-
+        let idxCheckedLines = byteWordIndexTransformer(chLines); 
+        if(typeof idxCheckedLines === 'string'){
+            return idxCheckedLines;
+        }
+        else{
+            chLines = idxCheckedLines; 
+        }
+        
     }
 
 
-    const res = objTransformer(chLines, commandsList, registersNameList, i);
+    const res = objTransformer(chLines, commandsList, registersNameList, i, labNum);
     //console.log(res)
 
     //console.log(labels);
@@ -64,14 +71,21 @@ export function parser(lines: string[], labNum: number | undefined, commandsList
 
 function byteWordIndexTransformer(lines: string[]) {
     for (let i = 0; i < lines.length; i++) {
-        // Регулярное выражение для поиска byte[] или word[] и захвата содержимого внутри скобок
-        const match = lines[i].match(/(?:byte|word)\[([^\]]*)\]/);
+        const match = lines[i].match(/(byte|word)\[([^\]]*)\]/);
         
         if (match) {
-            // match[1] содержит содержимое внутри скобок
-            console.log(`Строка ${i + 1}: ${match[1]}`);
+            const type = match[1]; 
+            const index = match[2];
+            const newIndex = idxResv(index);
+            
+            if (newIndex) {
+                lines[i] = lines[i].replace(match[0], `${type}[${newIndex}]`);
+            } else {
+                return mess.err_ru.index_err;
+            }
         }
     }
+    return lines;
 }
 
 
@@ -162,7 +176,7 @@ function macrosTransformer(lines: string[]) {
 
 // ======================================
 
-function objTransformer(lines: string[], commandsList: string[], registersNameList: string[], i: number = 0) {
+function objTransformer(lines: string[], commandsList: string[], registersNameList: string[], i: number = 0, labNum?: number) {
     //let error_ = "unknow err"
 
     let allInstr: AllInstructions[] = [];
@@ -230,6 +244,9 @@ function objTransformer(lines: string[], commandsList: string[], registersNameLi
             continue;
         }
 
+        // if(labNum == 3){
+        //     let byteWordCheck = 
+        // }
         return simpleInstrCheck;
 
     }
