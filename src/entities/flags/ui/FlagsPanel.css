@@ -1,0 +1,40 @@
+.flags {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: var(--theme-panel);
+  width: max-content;
+}
+
+.flags__row {
+  display: flex;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.flags__name {
+  min-width: 2.2em;
+  text-align: center;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.flags__value {
+  min-width: 2.2em;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.flags__value.is-set {
+  color: var(--changed);
+  font-weight: 700;
+}
+
+.flags__value.is-changed {
+  background: var(--changed-soft);
+  outline: 2px solid var(--changed);
+}

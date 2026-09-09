@@ -1,0 +1,44 @@
+.control-panel {
+  display: inline-flex;
+}
+
+.control-panel__group {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.control-panel__btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: var(--theme-panel);
+  white-space: nowrap;
+}
+
+.control-panel__btn:last-child {
+  border-right: none;
+}
+
+.control-panel__btn--compile {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.control-panel__btn--run {
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.control-panel__btn--animate.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.control-panel__btn--reset {
+  color: var(--err);
+}

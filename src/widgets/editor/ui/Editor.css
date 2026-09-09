@@ -1,0 +1,85 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--theme-panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.editor__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--grey-col);
+  border-bottom: 1px solid var(--border);
+}
+
+.editor__file-name {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+.editor__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 26px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.editor__icon-btn img {
+  width: 16px;
+  height: 16px;
+  filter: var(--icon-filter, none);
+}
+
+.editor__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.editor__numbers {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  min-width: 40px;
+  overflow: hidden;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  border-right: 1px solid var(--border);
+  background: var(--grey-col);
+  user-select: none;
+}
+
+.editor__number {
+  padding: 0 8px 0 4px;
+}
+
+.editor__text-area {
+  flex: 1;
+  overflow: auto;
+  padding: 10px 12px;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre;
+  outline: none;
+  background: var(--code-bg);
+  color: var(--text);
+  tab-size: 4;
+}

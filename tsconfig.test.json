@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "commonjs",
+    "lib": ["ES2023"],
+    "types": [],
+    "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
+    "moduleResolution": "node10",
+    "moduleDetection": "force",
+    "useDefineForClassFields": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "rootDir": "src",
+    "outDir": ".test-out"
+  },
+  "include": ["src/shared/**/*", "src/features/**/*"],
+  "exclude": ["src/shared/lib/dom.ts"]
+}

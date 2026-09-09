@@ -1,0 +1,79 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 18px;
+  background: var(--grey-col);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.app-header__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-header__logo {
+  height: 34px;
+  width: auto;
+}
+
+.app-header__title {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.app-header__name {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.app-header__sub {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.app-header__link {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13.5px;
+}
+
+.app-header__link:hover {
+  background: var(--grey-hover);
+  text-decoration: none;
+}
+
+.app-header__right {
+  display: flex;
+  align-items: center;
+}
+
+.app-header__theme-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--theme-panel);
+  padding: 0;
+}
+
+.app-header__theme-btn img {
+  width: 16px;
+  height: 16px;
+  filter: var(--icon-filter);
+}

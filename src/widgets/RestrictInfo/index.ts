@@ -1,1 +1,0 @@
-export { RestrictInfo } from './ui/RestrictInfo'

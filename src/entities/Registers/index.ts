@@ -1,1 +1,0 @@
-export { Registers } from './ui/Register'

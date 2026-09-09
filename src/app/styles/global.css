@@ -1,0 +1,133 @@
+/* ==========================================================================
+   Глобальные стили и темы (светлая/тёмная), в духе старого проекта
+   ========================================================================== */
+
+:root {
+  --theme-bg: #f4f6fa;
+  --theme-panel: #ffffff;
+  --theme-col: #ffffff;          /* фон активной вкладки / полей */
+  --grey-col: #edf1f8;           /* панельные шапки */
+  --grey-hover: #dbe2ee;
+  --border: #c9d2e0;
+  --text: #1d2530;
+  --text-dim: #5c6b80;
+  --accent: #863bff;             /* фирменный фиолетовый из логотипа */
+  --accent-soft: #f0eaff;
+  --ok: #2e9e44;
+  --ok-soft: #e0f4e4;
+  --err: #c62828;
+  --err-soft: #fdeaea;
+  --warn: #b26a00;
+  --warn-soft: #fff3e0;
+  --changed: #0087a8;            /* «бирюзовый» подсвеченный изменившееся значение */
+  --changed-soft: #d8f3fa;
+  --code-bg: #ffffff;
+  --screen-bg: #101010;
+  --screen-text: #e8ffe8;
+  --shadow: 0 1px 3px rgba(20, 30, 50, 0.08);
+  --icon-filter: none;
+  --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas,
+    'Courier New', monospace;
+}
+
+:root[data-theme='dark'] {
+  --theme-bg: #14171d;
+  --theme-panel: #1b1f27;
+  --theme-col: #1b1f27;
+  --grey-col: #232936;
+  --grey-hover: #2d3546;
+  --border: #39414f;
+  --text: #e4e9f2;
+  --text-dim: #93a0b4;
+  --accent: #a983ff;
+  --accent-soft: #2a2440;
+  --ok: #57c973;
+  --ok-soft: #1d3325;
+  --err: #ef7c7c;
+  --err-soft: #3a2222;
+  --warn: #e8a94e;
+  --warn-soft: #3a2f1d;
+  --changed: #4fd8e8;
+  --changed-soft: #173740;
+  --code-bg: #161a21;
+  --screen-bg: #000000;
+  --screen-text: #c8ffc8;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Segoe UI', 'PT Sans', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  background-color: var(--theme-bg);
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 100vw;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text);
+  background-color: var(--grey-col);
+  border: 1px solid var(--border);
+  transition: background-color 0.12s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: var(--grey-hover);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+select {
+  font-family: inherit;
+  color: var(--text);
+  background-color: var(--theme-col);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 6px;
+}
