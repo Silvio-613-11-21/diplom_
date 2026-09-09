@@ -91,6 +91,12 @@ button {
   transition: background-color 0.12s ease;
 }
 
+/* Атрибут hidden обязан побеждать любые display из стилей компонентов —
+   иначе скрытые вкладки отладчика «наползают» друг на друга */
+[hidden] {
+  display: none !important;
+}
+
 button:hover:not(:disabled) {
   background-color: var(--grey-hover);
 }

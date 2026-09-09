@@ -55,8 +55,8 @@
 
 .debugger__content--debug {
   display: grid;
-  grid-template-columns: minmax(240px, 32%) 1fr;
-  grid-template-rows: minmax(140px, 44%) minmax(140px, 1fr);
+  grid-template-columns: minmax(220px, 32%) minmax(0, 1fr);
+  grid-template-rows: minmax(120px, 44%) minmax(120px, 1fr);
   grid-template-areas:
     'code right'
     'mem  mem';
