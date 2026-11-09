@@ -12,7 +12,9 @@ interface numOperand {
     value: number
 };
 
-const regList = ['si', 'bx'] as const;
+// Регистры-указатели памяти. Полурегистры bx/bp (bh/bl) допускаются как база:
+// в учебных задачах Л/Р 3 удобно вычислять адрес в BH/BL и обращаться как byte[si+bh]
+const regList = ['si', 'bx', 'di', 'bp', 'bh', 'bl', 'dh', 'dl'] as const;
 type Reg = typeof regList[number];
 
 class RegExp {
@@ -133,24 +135,30 @@ const operParser = (line: string): false | Operand[] => {
     return ops;
 }
 
+/**
+ * Приведение выражения-адреса к виду:
+ *   si            - только индексный регистр
+ *   si+0005       - индексный регистр и смещение
+ *   0005          - только смещение
+ *   si+bx         - два индексных регистра (допускается Л/Р 3)
+ */
 export function idxResv(line: string) {
     const ops = operParser(line);
     if (!ops) { 
         return false; 
     }
 
-    let res = '';
+    // Базовые регистры (BX/BP) и индексные (SI/DI) могут встретиться только по одному разу
+    // и только со знаком плюс
+    const baseRegList = ['bx', 'bp', 'bh', 'bl', 'dh', 'dl'];
+    const indexRegList = ['si', 'di'];
 
-    // Проверяем si - должен быть только со знаком + и не более одного раза
-    let siCount = ops.filter(item => item.value === 'si').length;
-    if (siCount > 1) {
-        return false;
-    }
+    for (const regs of [baseRegList, indexRegList]) {
+        const count = ops.filter(item => regs.includes(item.value)).length;
 
-    // Проверяем bx - должен быть только со знаком + и не более одного раза
-    let bxCount = ops.filter(item => item.value === 'bx').length;
-    if (bxCount > 1) {
-        return false;
+        if (count > 1) {
+            return false;
+        }
     }
 
     // Проверяем, что регистры только со знаком + и не участвуют в умножении/делении
@@ -290,33 +298,32 @@ export function idxResv(line: string) {
     // Формируем результат
     let numResStr = negativeNumberTransform(numRes);
     
-    // Добавляем регистры в правильном порядке (сначала si, потом bx)
-    let siElem = ops.find(item => item.value === 'si');
-    let bxElem = ops.find(item => item.value === 'bx');
-    
-    // Формируем строку с регистрами
+    // Регистры добавляем в порядке: сначала базовый (bx/bp), потом индексный (si/di),
+    // чтобы эмулятор однозначно мог их разобрать
+    const baseElem = ops.find(item => baseRegList.includes(item.value as any));
+    const indexElem = ops.find(item => indexRegList.includes(item.value as any));
+
     let regStr = '';
-    if (siElem) {
-        regStr += 'si';
+    if (baseElem) {
+        regStr += baseElem.value;
     }
-    if (bxElem) {
+    if (indexElem) {
         if (regStr) {
             regStr += '+';
         }
-        regStr += 'bx';
-    }
-    
-    // Если есть регистры и число, объединяем с +
-    if (regStr) {
-        // Проверяем, что число не равно 0 (если 0, то не добавляем +0)
-        if (numRes !== 0) {
-            res = regStr + '+' + numResStr;
-        } else {
-            res = regStr;
-        }
-    } else {
-        res = numResStr;
+        regStr += indexElem.value;
     }
 
-    return res;
+    // Если есть регистры и число, объединяем с +
+    if (regStr) {
+        // Смещение оставляем в 16-ричном виде с суффиксом h - чтобы при вычислении
+        // адреса на этапе выполнения оно не путалось с десятичным числом
+        if (numRes !== 0) {
+            return regStr + '+' + numResStr + 'h';
+        }
+
+        return regStr;
+    }
+
+    return numResStr;
 }

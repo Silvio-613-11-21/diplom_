@@ -1,5 +1,5 @@
 import './Restrictinfo.css'
-import html from './Restrictinfo.html?raw'
+import html from './RestrictInfo.html?raw'
 import pic from 'shared/assets/images/attention.svg'
 
 import { Restricts } from 'src/shared/types/Restricts/Restricts';
@@ -19,13 +19,17 @@ export class RestrictInfo {
             sp2.textContent = "Вы не можете воспользоваться эмулятором"
             //sp3.textContent = "use right link"
         }
-        else if(restricts.lab === undefined){
-            sp1.textContent = `Разрешено использовать только команды: ${restricts.cmd} `;
-            sp2.textContent = `и регистры: ${restricts.rl}`;  
+        else if (restricts.lab === 3) {
+            sp1.textContent = `Разрешено использовать только команды: ${restricts.cmd.join(', ')} `;
+            sp2.textContent = `и регистры: ${restricts.rl.join(', ')}. А также можно обращаться к памяти: byte[], word[]`;
+
+            if (restricts.task) {
+                sp3.textContent = `Задание: ${restricts.task}`;
+            }
         }
-        else if (restricts.lab = 3){
+        else {
             sp1.textContent = `Разрешено использовать только команды: ${restricts.cmd} `;
-            sp2.textContent = `и регистры: ${restricts.rl}. А также можно обращаться к памяти: byte[], word[]`;  
+            sp2.textContent = `и регистры: ${restricts.rl}`;
         }
 
 

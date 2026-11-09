@@ -4,7 +4,7 @@
 // import { SingleInstruction } from "src/shared/types/ASMcode/SingleInstructio";
 
 import { AllInstructions } from "src/shared/types/ASMcode/AllInstructions";
-import { Macros } from "src/shared/types/ASMcode/Macros";
+import { LabelCommand } from "src/shared/types/ASMcode/AllInstructions";
 
 // import { RegExp } from "./RegExp";
 import { SimpleInstructionsReader as SIR } from "./SimpeInstructionsReader";
@@ -61,23 +61,33 @@ export class InsrtrInspector {
             return false;
         }
 
-        let register = '';
-        for (let i = cmd.length; i < line.length; i++) {
-            register += line[i];
-        }
+        const operand = line.slice(cmd.length);
 
-        if (register == '') {
+        if (operand === '') {
             return false;
         }
 
-        if (!registersNameList.includes(register)) {
+        // inc byte[5] / dec word[si+1]
+        if (SIR.isMemoryOperand(operand)) {
+            const memory = SIR.parseMemoryOperand(operand)!;
+
+            return {
+                kind: 'singleInstr',
+                cmd: cmd,
+                register: memory.system,
+                index: operand.slice(memory.system.length + 1, -1),
+                memory: memory
+            } as AllInstructions;
+        }
+
+        if (!registersNameList.includes(operand)) {
             return false;
         }
 
         return {
             kind: 'singleInstr',
             cmd: cmd,
-            register: register
+            register: operand
         } as AllInstructions;
 
     }
@@ -85,12 +95,15 @@ export class InsrtrInspector {
     static labelInstructionProcessing(line: string, commandsList: string[]) {
         // console.log('ys sddf')
 
-        let labelInstrList = ["loop", "js", "jns", "jz", "jnz", "jmp", "call"];
+        let labelInstrList = [
+            "loop", "js", "jns", "jz", "jnz", "jmp", "call",
+            "je", "jne", "ja", "jb", "jl", "jg", "jle", "jge"
+        ];
 
         let cmd;
         for (const instr of labelInstrList) {
             if (instr === line.slice(0, instr.length)) {
-                cmd = instr as "loop" | "js" | "jns" | "jz" | "jnz" | "jmp";
+                cmd = instr as LabelCommand;
             }
         }
 
@@ -121,11 +134,6 @@ export class InsrtrInspector {
 
     static labelProcessing(line: string) {
 
-        // let label: AllInstructions = {
-        //     kind: 'lb',
-        //     name: ''
-        // }
-
         let name = '';
         for (let i = 0; i < line.length; i++) {
             name += line[i];
@@ -145,17 +153,17 @@ export class InsrtrInspector {
         return false;
     }
 
+    /**
+     * Разбор простой команды (mov, add, ... , byte[5], 'H')
+     */
     static simpleInctructionProcessing(line: string,
         commandsList: string[],
         registersNameList: string[],
         i = 0
     ) {
-        console.log("line:" + line)
-
         //==================================================
         const cmd = SIR.commands(i, line, commandsList);
         if (cmd === null) {
-            //console.log("ya zdes")
             return mess.messages_ru[1];
         }
         else {
@@ -164,35 +172,36 @@ export class InsrtrInspector {
         //==================================================
 
         //==================================================
-        let rgBw; 
-        const rg = SIR.registers(i, line, registersNameList);
-        const bw = SIR.byteWord(i, line)
+        let register: string | undefined = undefined;
+        let targetMemory: { system: 'byte' | 'word', address: string } | undefined = undefined;
 
-        if (rg === null && bw === null) {
+        const reg = SIR.registers(i, line, registersNameList);
+        const mem = SIR.byteWord(i, line);
+
+        if (reg) {
+            register = reg;
+            i += reg.length;
+        }
+        else if (mem) {
+            register = mem.cmd;
+            targetMemory = { system: mem.cmd as 'byte' | 'word', address: mem.idx };
+            i += mem.cmd.length + 2 + mem.idx.length;
+        }
+        else {
             return mess.messages_ru[2];
         }
-        else if(rg){
-            i += rg.length;
-            rgBw = rg; 
-        }
-        else if(bw){
-            i += 6 + bw.idx.length; 
-            rgBw = bw.cmd; 
-        }
-        //=================================================
+        //==================================================
 
-        //=================================================
+        //==================================================
         if (line[i] === ",") {
             i++;
         }
         else {
             return mess.messages_ru[3];
         }
+        //==================================================
 
-        //================================================
-
-        // ===============================================
-
+        //==================================================
         const value = SIR.value(i, line, line.length);
         if (value.length == 0) {
             return mess.messages_ru[4];
@@ -202,19 +211,25 @@ export class InsrtrInspector {
         if (checkedValue.state === false) {
             return checkedValue.value;
         }
-        //console.log(checkedValue)
+        //==================================================
 
-        // ==============================================
-        return {
+        const instr = {
             kind: 'smplinstr',
             command: cmd,
-            register: rgBw,
+            register: register,
             secondRegister: checkedValue,
-            index: bw?.idx,
+            index: mem?.idx,
         } as AllInstructions;
+
+        if (targetMemory) {
+            (instr as any).targetMemory = targetMemory;
+        }
+
+        if (checkedValue.system === 'byte' || checkedValue.system === 'word') {
+            const memory = SIR.parseMemoryOperand(checkedValue.value)!;
+            (instr as any).memory = memory;
+        }
+
+        return instr;
     }
-
-
-
-    
 }

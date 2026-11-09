@@ -8,6 +8,8 @@ import { idxResv } from "./model/BTHelpers/IndexResolve";
 import { Macros } from "src/shared/types/ASMcode/Macros";
 import { MacrosReader as MR } from "./model/MTHelpers/MacrosReader";
 
+import { expandRegisters, HALF_REGISTERS } from "src/shared/types/ASMcode/HalfRegisters";
+
 import mess from "./config/messages.json"
 
 
@@ -15,13 +17,29 @@ import mess from "./config/messages.json"
 let labels: string[];
 let labelsFromInstr: string[];
 
-let codeSegmentName: string;
 let i = 0;
 
-export function parser(lines: string[], labNum: number | undefined, commandsList: string[], registersNameList: string[]) {
+export function parser(lines: string[],
+    labNum: number | undefined,
+    commandsList: string[],
+    registersNameList: string[],
+    indexRegs?: string[],
+    forbiddenRegs?: string[]
+) {
     labels = [];
     labelsFromInstr = [];
     i = 0;
+
+    // регистры, запрещенные условием задачи (например, BX и SI в задаче 3.0)
+    // проверяем по исходному тексту - пробелы тогда еще на месте
+    if (forbiddenRegs && forbiddenRegs.length > 0) {
+        const sourceLines = lines
+            .map(line => RegExp.delComments(line).toLowerCase());
+
+        if (checkForbiddenRegisters(sourceLines, forbiddenRegs)) {
+            return mess.err_ru.forbidden_reg_err;
+        }
+    }
 
 
 
@@ -44,7 +62,7 @@ export function parser(lines: string[], labNum: number | undefined, commandsList
 
     //
     if (labNum != undefined && labNum >= 3) {
-        let idxCheckedLines = byteWordIndexTransformer(chLines); 
+        let idxCheckedLines = byteWordIndexTransformer(chLines, registersNameList, indexRegs); 
         if(typeof idxCheckedLines === 'string'){
             return idxCheckedLines;
         }
@@ -55,7 +73,19 @@ export function parser(lines: string[], labNum: number | undefined, commandsList
     }
 
 
-    const res = objTransformer(chLines, commandsList, registersNameList, i, labNum);
+    // работа с памятью доступна только начиная с Л/Р 3
+    if (labNum === undefined || labNum < 3) {
+        for (const line of chLines) {
+            if (/(byte|word)\[/.test(line)) {
+                return mess.err_ru.memory_err;
+            }
+        }
+    }
+
+    // разрешенные регистры дополняем полурегистрами: ax -> ax, ah, al
+    const registersWithHalves = expandRegisters(registersNameList);
+
+    const res = objTransformer(chLines, commandsList, registersWithHalves, i);
     //console.log(res)
 
     //console.log(labels);
@@ -69,20 +99,86 @@ export function parser(lines: string[], labNum: number | undefined, commandsList
 
 // ===========================================
 
-function byteWordIndexTransformer(lines: string[]) {
+/**
+ * Проверка того, что в коде не используются запрещенные условием регистры.
+ * Учитываются и полурегистры: если запрещен BX, то запрещены и BH, BL.
+ * Возвращает имя первого найденного запрещенного регистра.
+ */
+function checkForbiddenRegisters(lines: string[], forbiddenRegs: string[]): string | undefined {
+    for (const line of lines) {
+        for (const reg of forbiddenRegs) {
+            const halves = Object.entries(HALF_REGISTERS)
+                .filter(([, half]) => half.full === reg)
+                .map(([name]) => name);
+
+            const allNames = [reg, ...halves];
+
+            for (const name of allNames) {
+                if (hasWord(line, name)) {
+                    return name;
+                }
+            }
+        }
+    }
+
+    return undefined;
+}
+
+function hasWord(line: string, word: string): boolean {
+    let index = line.indexOf(word);
+
+    while (index !== -1) {
+        const before = index === 0 ? '' : line[index - 1];
+        const after = index + word.length >= line.length ? '' : line[index + word.length];
+
+        const beforeOk = before === '' || !/[a-z0-9]/.test(before);
+        const afterOk = after === '' || !/[a-z0-9]/.test(after);
+
+        if (beforeOk && afterOk) {
+            return true;
+        }
+
+        index = line.indexOf(word, index + 1);
+    }
+
+    return false;
+}
+
+function byteWordIndexTransformer(lines: string[], registersNameList: string[], indexRegs?: string[]) {
     for (let i = 0; i < lines.length; i++) {
-        const match = lines[i].match(/(byte|word)\[([^\]]*)\]/);
-        
-        if (match) {
-            const type = match[1]; 
+        // в одной строке может быть два обращения к памяти:
+        // mov byte[bx], byte[si+1]
+        const matches = [...lines[i].matchAll(/(byte|word)\[([^\]]*)\]/g)];
+
+        for (const match of matches) {
+            const type = match[1];
             const index = match[2];
+
+            // в адресном выражении допустимы только регистры-указатели
+            const memoryRegs = ['si', 'bx', 'di', 'bp'];
+            const indexLower = index.toLowerCase();
+
+            for (const reg of memoryRegs) {
+                if (!indexLower.includes(reg)) {
+                    continue;
+                }
+
+                if (!registersNameList.includes(reg)) {
+                    return mess.err_ru.memory_reg_err;
+                }
+
+                if (indexRegs && !indexRegs.includes(reg)) {
+                    return mess.err_ru.memory_reg_err;
+                }
+            }
+
             const newIndex = idxResv(index);
-            
-            if (newIndex) {
-                lines[i] = lines[i].replace(match[0], `${type}[${newIndex}]`);
-            } else {
+
+            if (!newIndex) {
                 return mess.err_ru.index_err;
             }
+
+            lines[i] = lines[i].replace(match[0], `${type}[${newIndex}]`);
         }
     }
     return lines;
@@ -96,8 +192,17 @@ function macrosTransformer(lines: string[]) {
     let MacrosArr: Macros[] = [];
     let MacrosNames: string[] = [];
 
+    // защита от бесконечной рекурсии макросов и слишком большого разворачивания
+    const maxLines = 10000;
+    let expansions = 0;
+    const maxExpansions = 5000;
+
     let i = 0;
     while (i < lines.length) {
+        if (lines.length > maxLines || expansions > maxExpansions) {
+            return mess.err_ru.macroRecursion_err;
+        }
+
         let isMacro = MR.macrostart(lines[i]);
         if (isMacro) {
             let start = i;
@@ -161,8 +266,10 @@ function macrosTransformer(lines: string[]) {
 
 
                 lines.splice(i, 1, ...newLines);
+                expansions++;
 
-                i += newLines.length;
+                // остаемся на той же позиции: вставленные строки тоже могут содержать
+                // вызовы макросов (вложенные макросы, макрос внутри макроса)
                 continue;
             }
         }
@@ -176,7 +283,7 @@ function macrosTransformer(lines: string[]) {
 
 // ======================================
 
-function objTransformer(lines: string[], commandsList: string[], registersNameList: string[], i: number = 0, labNum?: number) {
+function objTransformer(lines: string[], commandsList: string[], registersNameList: string[], i: number = 0) {
     //let error_ = "unknow err"
 
     let allInstr: AllInstructions[] = [];
@@ -269,7 +376,6 @@ class Init {
         let res = RegExp.extractSegmentName(line);
         if (res) {
             i++;
-            codeSegmentName = res;
             return;
         }
     }
@@ -285,7 +391,8 @@ class Init {
     static lines(lines: string[], i: number = 0) {
         for (let idx = i; idx < lines.length; idx++) {
             lines[idx] = RegExp.delComments(lines[idx]);
-            lines[idx] = lines[idx].toLowerCase();
+            // регистр меняем только вне кавычек: 'Hello, World!' должен остаться как есть
+            lines[idx] = RegExp.toLowerCase(lines[idx]);
         }
 
         for (let idx = i; idx < lines.length; idx++) {

@@ -1,5 +1,3 @@
-import { Macros } from "src/shared/types/ASMcode/Macros"
-
 export class MacrosReader {
 
     static macrostart(line: string) {
@@ -31,14 +29,27 @@ export class MacrosReader {
     }
 
     static macroCall(line: string, macrosNames: string[]) {
-        for (let mn of macrosNames) {
-            if (line !== undefined)
-                if (line.slice(0, mn.length) === mn) {
-                    let params = line.slice(mn.length);
-                    let paramsArr = params.split(',');
-                    return { mn, paramsArr }
-                }
+        // объявление макроса вызовом не является
+        if (line === undefined || line.slice(0, 6) === '%macro' || line.slice(0, 9) === '%endmacro') {
+            return false;
+        }
 
+        for (let mn of macrosNames) {
+            // имя макроса должно быть отдельным словом: printhello, а не printhello2
+            if (line.slice(0, mn.length) !== mn) {
+                continue;
+            }
+
+            const next = line[mn.length];
+
+            if (next !== undefined && /[a-z_]/.test(next)) {
+                continue;
+            }
+
+            let params = line.slice(mn.length).trim();
+            // макрос без параметров вызывается просто по имени
+            let paramsArr = params === '' ? [] : params.split(',');
+            return { mn, paramsArr }
         }
         return false;
     }

@@ -2,6 +2,7 @@ import html from './Register.html?raw';
 import './Register.css'
 
 import { RegistersState } from '../model/RegistersState';
+import { HALF_REGISTERS } from 'src/shared/types/ASMcode/HalfRegisters';
 
 export class Registers extends RegistersState {
    
@@ -17,11 +18,17 @@ export class Registers extends RegistersState {
     
 
     public override setValue(name: string, value:string) : boolean {
-        
-        let reg = document.getElementById(`${name}`) as HTMLElement;
-        reg.textContent =  `${value.toUpperCase()}`; 
-        
-        return super.setValue(name, value);
+        const res = super.setValue(name, value);
+
+        // у полурегистра нет своей ячейки в таблице - показываем полный регистр
+        const full = HALF_REGISTERS[name]?.full ?? name;
+        const reg = document.getElementById(full);
+
+        if (reg) {
+            reg.textContent = (this.getValueByName(full) ?? value).toUpperCase();
+        }
+
+        return res;
     }
 
     public override resetAll(): void {

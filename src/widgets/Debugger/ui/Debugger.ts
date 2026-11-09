@@ -106,6 +106,7 @@ export class Debugger {
     public resetAll() {
         this.reg.resetAll();
         this.flagReg.resetAll(); 
+        this.dataSegment.reset(); 
         this.codeSegment.setStep(0); 
     }
 }
