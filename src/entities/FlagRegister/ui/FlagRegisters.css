@@ -1,0 +1,9 @@
+.FlagRegisterTable{
+    font-size: x-large;
+}
+
+.FlagRegisterTable td {
+    min-width: 35px;  
+    width: auto;
+    text-align: center;
+}
