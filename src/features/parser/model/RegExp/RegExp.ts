@@ -61,6 +61,11 @@ export
     //=============================
 
     static extractSegmentName(input: string): string | false {
+        // защита от undefined: директивы проверяются и для пустой программы
+        if (typeof input !== 'string') {
+            return false;
+        }
+
         const regex = /^(.+)segment\.data$/;
         const match = input.match(regex);
         if (match) {
@@ -72,6 +77,10 @@ export
     }
 
      static org100hCheck(input: string) {
+        if (typeof input !== 'string') {
+            return false;
+        }
+
         const regex = /^org100h$/;
         const match = input.match(regex);
         if (match) {

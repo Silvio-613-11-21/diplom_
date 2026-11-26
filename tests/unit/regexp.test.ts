@@ -129,6 +129,26 @@ describe('lineIsEmpty - пустые строки', () => {
     });
 });
 
+describe('Защита от некорректного входа', () => {
+    it('extractSegmentName не падает на undefined', () => {
+        // регресс: пустая программа -> chLines[0] === undefined -> падение на .match()
+        expect(RegExp.extractSegmentName(undefined as any)).toBe(false);
+    });
+
+    it('org100hCheck не падает на undefined', () => {
+        expect(RegExp.org100hCheck(undefined as any)).toBe(false);
+    });
+
+    it('extractSegmentName находит имя сегмента', () => {
+        expect(RegExp.extractSegmentName('codesegment.data')).toBe('code');
+    });
+
+    it('org100hCheck распознаёт директиву', () => {
+        expect(RegExp.org100hCheck('org100h')).toBe(true);
+        expect(RegExp.org100hCheck('movax,5')).toBe(false);
+    });
+});
+
 describe('Комплексный сценарий - строка из задания 3.0', () => {
     it('надпись Hello, World! переживает все преобразования', () => {
         const line = "MOV WORD[45h], 'He'  ; запись слова";

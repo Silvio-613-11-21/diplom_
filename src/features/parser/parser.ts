@@ -374,7 +374,14 @@ function labelsCheck(labels: string[], labelsFromInstr: string[]): boolean {
 // =====================================
 
 class Init {
-    static codeSegment(line: string) {
+    // пустая программа (нет ни одной строки) - обычная ситуация: пользователь
+    // нажал "Собрать" на пустом редакторе. Тогда line === undefined, и проверки
+    // директив должны просто ничего не делать, а не падать
+    static codeSegment(line: string | undefined) {
+        if (line === undefined) {
+            return;
+        }
+
         let res = RegExp.extractSegmentName(line);
         if (res) {
             i++;
@@ -382,7 +389,11 @@ class Init {
         }
     }
 
-    static org100h(line: string) {
+    static org100h(line: string | undefined) {
+        if (line === undefined) {
+            return;
+        }
+
         if (RegExp.org100hCheck(line)) {
             i++;
             return;

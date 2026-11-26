@@ -127,11 +127,22 @@ int 21h`);
         expect(assemble()).toBe('Регистр запрещён условием задачи');
     });
 
-    it('пустая программа не компилируется', () => {
+    it('пустая программа не компилируется и не бросает исключение', () => {
         mount(3, 0);
         typeCode('');
 
-        expect(assemble()).not.toBe('Успешная компиляция');
+        // регресс: раньше пустой редактор приводил к падению
+        // "Cannot read properties of undefined (reading 'match')"
+        let error: unknown = undefined;
+
+        try {
+            expect(assemble()).not.toBe('Успешная компиляция');
+        } catch (e) {
+            error = e;
+        }
+
+        expect(error).toBeUndefined();
+        expect(consoleText()).toBe('Нет кода для компиляции');
     });
 });
 
