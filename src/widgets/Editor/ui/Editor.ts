@@ -4,7 +4,6 @@ import './Editor.css'
 import { tabExpection } from '../model/tabExpection';
 import { linesReader } from '../model/linesReader';
 
-
 export class Editor {
 
     private app: HTMLElement;
@@ -12,35 +11,32 @@ export class Editor {
     public linesArr: string[] = [];
 
     private editor = editor;
-    private textArea: HTMLElement | null = null;
+    private textArea: HTMLTextAreaElement | null = null;
 
     constructor(app: HTMLElement) {
         this.app = app;
         this.init();
-        this.textArea = document.getElementById("textArea") as HTMLElement;
+        this.textArea = document.getElementById("textArea") as HTMLTextAreaElement;
 
 
+        
         this.textArea.addEventListener('input', () => {
-            if (!this.textArea?.innerHTML) {
-                return;
-            }
-            this.linesArr = linesReader(this.textArea.innerHTML);
-            console.log(this.linesArr)
-
-        })
+            const text = this.textArea!.value;      
+            this.content = text;
+            this.linesArr = linesReader(text);
+            console.log(this.linesArr);
+        });
+        
 
         this.textArea.addEventListener("keydown", (e) => {
             if (e.key === 'Tab') {
-                tabExpection(e, this.textArea as HTMLDivElement);
+                tabExpection(e, this.textArea);
                 return;
             }
         });
 
 
     }
-
-
-
     private init() {
         this.app.insertAdjacentHTML('beforeend', this.editor);
     }

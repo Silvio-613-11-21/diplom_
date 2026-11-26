@@ -19,6 +19,6 @@ export function Workpage(App: HTMLElement, restricts: Restricts | undefined) {
 
     const editor = new Editor(editorSpace);
     const debugger_ = new Debugger(debuggerSpace);
-    const controlpanel =  new ControlPanel(controlpanelSpace, editor, debugger_, restricts);
-    const restrictinfo = new RestrictInfo(restrictinfoSpace,  restricts); 
+    new ControlPanel(controlpanelSpace, editor, debugger_, restricts);
+    new RestrictInfo(restrictinfoSpace, restricts);
 }

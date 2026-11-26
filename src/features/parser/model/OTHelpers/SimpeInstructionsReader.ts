@@ -2,6 +2,7 @@ import { VariableValue } from "src/shared/types/ASMcode/VariableValue";
 
 import mess from "../../config/messages.json"
 
+const memoryRegExp = /^(byte|word)\[([^\]]*)\]$/;
 
 class RegExp {
     //====================================
@@ -35,7 +36,7 @@ export class SimpleInstructionsReader {
     static byteWord(index: number, code: string): { cmd: string, idx: string } | null {
 
         code = code.slice(index);
-        const match = code.match(/(byte|word)\[([^\]]*)\]/);
+        const match = code.match(/^(byte|word)\[([^\]]*)\]/);
         if (match) {
             return { cmd: match[1], idx: match[2] }
         }
@@ -47,6 +48,11 @@ export class SimpleInstructionsReader {
         for (let i = 0; i < comamndsList.length; i++) {
             const cmdLen = comamndsList[i].length;
             if (comamndsList[i] === code.slice(index, index + cmdLen)) {
+                // "sub:" - метка, а не команда sub (имя метки может совпадать с командой)
+                if (code[index + cmdLen] === ':') {
+                    continue;
+                }
+
                 return comamndsList[i];
             }
         }
@@ -77,6 +83,16 @@ export class SimpleInstructionsReader {
             }
         }
         else {
+            // регистры проверяем раньше чисел: ah / bh / ch / dh заканчиваются на h,
+            // но это имена полурегистров, а не 16-ричные константы
+            if (registersNameList.includes(val)) {
+                return {
+                    state: true,
+                    system: "register",
+                    value: val
+                }
+            }
+
             const lastChar = val.slice(-1);
             //console.log(lastChar)
             switch (lastChar) {
@@ -179,16 +195,6 @@ export class SimpleInstructionsReader {
 
             }
 
-            if (registersNameList.includes(val)) {
-                //console.log("asa")
-                return {
-                    state: true,
-                    system: "register",
-                    value: val
-                }
-
-            }
-
             let match = val.match(/(byte|word)\[([^\]]*)\]/)
             if (match) {
                 let sys: 'word' | 'byte'
@@ -224,5 +230,29 @@ export class SimpleInstructionsReader {
             value: mess.messages_ru[6]
         }
     }
-}
 
+    /**
+     * Проверка того, что строка является обращением к памяти: byte[...] или word[...]
+     */
+    static isMemoryOperand(val: string) {
+        return memoryRegExp.test(val);
+    }
+
+    /**
+     * Разбор обращения к памяти на адрес и размер ячейки
+     * byte[5]  -> { system: 'byte', address: '5' }
+     * word[si] -> { system: 'word', address: 'si' }
+     */
+    static parseMemoryOperand(val: string): { system: 'byte' | 'word', address: string } | null {
+        const match = val.match(memoryRegExp);
+
+        if (!match) {
+            return null;
+        }
+
+        return {
+            system: match[1] as 'byte' | 'word',
+            address: match[2]
+        }
+    }
+}

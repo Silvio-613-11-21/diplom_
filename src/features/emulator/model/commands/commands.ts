@@ -142,4 +142,47 @@ export class Commands {
         val = valArr.join('');
         return val;
     }
+
+    //=============================== Работа с памятью (Л/Р 3) ===============================
+
+    /**
+     * Перевод строки символов в последовательность 16-ричных байт.
+     * 'He' -> '4865'
+     */
+    static charsToHex(chars: string): string {
+        let res = '';
+
+        for (let i = 0; i < chars.length; i++) {
+            res += chars.charCodeAt(i).toString(16).toUpperCase().padStart(2, '0');
+        }
+
+        return res;
+    }
+
+    /**
+     * Обратное преобразование: '4865' -> 'He'
+     */
+    static hexToChars(hex: string): string {
+        let res = '';
+
+        for (let i = 0; i + 1 < hex.length; i += 2) {
+            res += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16));
+        }
+
+        return res;
+    }
+
+    /**
+     * Разбиение строки на слова по 2 символа (для команды mov word[...], 'Hi')
+     * 'Hello, World!' -> 'He', 'll', 'o,', ' W', 'or', 'ld', '!'
+     */
+    static splitByWords(chars: string): string[] {
+        let words: string[] = [];
+
+        for (let i = 0; i < chars.length; i += 2) {
+            words.push(chars.slice(i, i + 2));
+        }
+
+        return words;
+    }
 }

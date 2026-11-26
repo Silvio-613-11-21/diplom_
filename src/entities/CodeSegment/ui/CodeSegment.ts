@@ -84,16 +84,34 @@ export class CodeSegment {
 
 
     // =====================================================
-    private instrParser(instr: AllInstructions, i?: number) {
+    private instrParser(instr: AllInstructions) {
         let res = '  ';
 
         if (instr.kind == 'smplinstr') {
-
             res += instr.command;
             res += "    ";
-            res += instr.register;
+
+            // первый операнд - регистр или ячейка памяти byte[...] / word[...]
+            if (instr.targetMemory) {
+                res += `${instr.targetMemory.system}[${instr.index ?? instr.targetMemory.address}]`;
+            }
+            else {
+                res += instr.register;
+            }
+
             res += ' , ';
-            res += instr.secondRegister.value;
+
+            // второй операнд - регистр, память, символ или число
+            if (instr.memory) {
+                const shownAddress = instr.secondRegister.index ?? instr.memory.address;
+                res += `${instr.memory.system}[${shownAddress}]`;
+            }
+            else if (instr.secondRegister.system === 'str') {
+                res += `'${instr.secondRegister.value}'`;
+            }
+            else {
+                res += instr.secondRegister.value;
+            }
         }
 
         if (instr.kind == 'lb') {
@@ -112,7 +130,14 @@ export class CodeSegment {
         if (instr.kind === 'singleInstr') {
             res += instr.cmd;
             res += '    ';
-            res += instr.register;
+
+            if (instr.memory) {
+                // адрес в том виде, в котором его написал пользователь
+                res += `${instr.memory.system}[${instr.index ?? instr.memory.address}]`;
+            }
+            else {
+                res += instr.register;
+            }
         }
 
         if (instr.kind === 'int') {
