@@ -26,18 +26,16 @@ export class ControlPanel {
     private runByStepBtn!: HTMLButtonElement;
 
     private instructions: AllInstructions[] | string | null = null;
-    private restricts: Restricts | null | undefined = null;
     private step = 0;
 
-    constructor(App: HTMLElement, editor: Editor, debugger_: Debugger, restricts: Restricts | null | undefined) {
+    constructor(App: HTMLElement, editor: Editor, debugger_: Debugger, restricts: Restricts | undefined) {
         this.editor = editor;
         this.debugger_ = debugger_;
-        this.restricts = restricts;
 
         this.init(App);
 
         if (restricts) {
-            this.assembleBtn.addEventListener('click', () => { this.reset(); this.parse(this.editor.content, restricts) })
+            this.assembleBtn.addEventListener('click', () => { this.reset(); this.parse(this.editor.linesArr, restricts) })
             this.runAllBtn.addEventListener('click', () => { this.runEmulate() });
             this.resetBtn.addEventListener('click', () => { this.reset() });
             this.runByStepBtn.addEventListener('click', () => { this.runByStep() });
@@ -52,8 +50,8 @@ export class ControlPanel {
         this.runByStepBtn = document.querySelector(".run-by-step") as HTMLButtonElement;
     }
 
-    private parse(code: string, restricts: Restricts) {
-        let instructions = parser(code, restricts.cmd, restricts.rl);
+    private parse(lines: string[], restricts: Restricts) {
+        let instructions = parser(lines, restricts.lab, restricts.cmd, restricts.rl, restricts.indexRegs, restricts.forbiddenRegs);
         if (typeof instructions == 'string') {
             this.debugger_.consolePrint(instructions);
             this.instructions = null;
@@ -78,18 +76,39 @@ export class ControlPanel {
             this.debugger_.resetAll();
 
             let i = 0;
+            // защита от зависания страницы при бесконечном цикле в программе
+            const maxSteps = 1_000_000;
+            let steps = 0;
+
             while (i < this.instructions.length) {
+                if (++steps > maxSteps) {
+                    this.debugger_.consolePrint("Превышено допустимое число шагов выполнения (возможен бесконечный цикл)");
+                    this.step = 0;
+                    return;
+                }
+
                 em.emulate(this.instructions, this.debugger_, i);
+                if (em.breakFl === true) {
+                    this.debugger_.codeSegment.setStep(i);
+                    this.step = 0;
+                    break;
+                }
+
                 if (em.trFl === false) {
                     i++;
                 }
                 else {
                     i = em.step;
                 }
-
             }
-            this.debugger_.consolePrintS("Конец программы")
-            this.step = 0;
+
+            // if (em.breakFl === true){
+
+            // }
+
+            if (i === this.instructions.length) {
+                this.setEnd();
+            }
         }
     }
 
@@ -108,6 +127,12 @@ export class ControlPanel {
             this.debugger_.debbCall();
 
             em.emulate(this.instructions, this.debugger_, this.step);
+
+            if (em.breakFl === true) {
+                this.debugger_.codeSegment.setStep(this.step);
+                return;
+            }
+
             if (em.trFl === false) {
                 this.step++;
             }
@@ -115,22 +140,28 @@ export class ControlPanel {
                 this.step = em.step;
             }
         }
-        else {
-            this.debugger_.consolePrint("Конец программы")
-            this.step = 0;
-            this.debugger_.codeSegment.setStep(this.step);
-        }
+        // else if(this.step === this.instructions.length) {
+        //     this.setEnd();
+        // }
     }
+
+
 
     public setStep(step: number) {
         this.step = step;
     }
 
+    //=========================================
     private reset() {
         this.debugger_.resetAll();
         this.debugger_.codeSegment.reset();
         this.instructions = null;
     }
 
+    private setEnd() {
+        this.debugger_.consolePrintS("Конец программы")
+        this.debugger_.codeSegment.setStep(this.step);
+        this.step = 0;
+    }
 
 }

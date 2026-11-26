@@ -11,13 +11,15 @@ export class CodeSegment {
     private instr_s: AllInstructions[] | undefined = undefined;
 
     private lineTpl: HTMLTemplateElement;
-    private codeSegmentElem: HTMLElement;
-
+    private codeSegmentLineSpace: HTMLElement;
+    private codeSegmentNumSpace: HTMLElement;
+    // private codeSegmentElem!: HTMLElement; 
 
     constructor(App: HTMLElement) {
         App.insertAdjacentHTML('afterbegin', html_);
         this.lineTpl = document.querySelector(".tpl-line-code-segment") as HTMLTemplateElement;
-        this.codeSegmentElem = document.querySelector(".code-segment") as HTMLElement;
+        this.codeSegmentLineSpace = document.querySelector(".line-code-segment-space") as HTMLElement;
+        this.codeSegmentNumSpace = document.querySelector(".num-code-segment-space") as HTMLElement;
 
         this.render();
     }
@@ -30,7 +32,9 @@ export class CodeSegment {
     public reset() {
         let lineElemList = document.querySelectorAll('.line-code-segment');
         lineElemList.forEach(line => { line.remove() })
-        this.codeSegmentElem.style.backgroundImage = `url("${imgback}")`;
+
+        this.codeSegmentNumSpace.replaceChildren();
+        this.codeSegmentLineSpace.style.backgroundImage = `url("${imgback}")`;
     }
 
     public setStep(step: number | "last") {
@@ -54,7 +58,7 @@ export class CodeSegment {
         }
         else {
             this.reset();
-            this.codeSegmentElem.style.backgroundImage = `none`;
+            this.codeSegmentLineSpace.style.backgroundImage = `none`;
 
             let i = 0;
             for (const instr of this.instr_s) {
@@ -62,12 +66,16 @@ export class CodeSegment {
                 let lineElem = fragment.firstElementChild as HTMLElement;
                 lineElem.id = `line-${i}`;
                 let p = lineElem.querySelector('pre') as HTMLElement;
-                p.textContent = this.instrParser(instr, i);
+                p.textContent = this.instrParser(instr);
 
-                this.codeSegmentElem.appendChild(lineElem);
+                this.codeSegmentLineSpace.appendChild(lineElem);
 
+                if (i < this.instr_s.length   ) {
+                    this.codeSegmentNumSpace.innerHTML += `<div>${i + 1}</div>`
+                }
                 i++;
             }
+
 
             this.setStep(0);
             return;
@@ -76,16 +84,34 @@ export class CodeSegment {
 
 
     // =====================================================
-    private instrParser(instr: AllInstructions, i: number) {
-        let res = String(i + 1) + '.  ';
+    private instrParser(instr: AllInstructions) {
+        let res = '  ';
 
         if (instr.kind == 'smplinstr') {
-
             res += instr.command;
             res += "    ";
-            res += instr.register;
+
+            // первый операнд - регистр или ячейка памяти byte[...] / word[...]
+            if (instr.targetMemory) {
+                res += `${instr.targetMemory.system}[${instr.index ?? instr.targetMemory.address}]`;
+            }
+            else {
+                res += instr.register;
+            }
+
             res += ' , ';
-            res += instr.secondRegister.value;
+
+            // второй операнд - регистр, память, символ или число
+            if (instr.memory) {
+                const shownAddress = instr.secondRegister.index ?? instr.memory.address;
+                res += `${instr.memory.system}[${shownAddress}]`;
+            }
+            else if (instr.secondRegister.system === 'str') {
+                res += `'${instr.secondRegister.value}'`;
+            }
+            else {
+                res += instr.secondRegister.value;
+            }
         }
 
         if (instr.kind == 'lb') {
@@ -94,18 +120,36 @@ export class CodeSegment {
         }
 
 
-        if(instr.kind == 'lbinstr') {
+        if (instr.kind == 'lbinstr') {
             res += instr.cmd;
             res += '    ';
-            res += instr.label; 
+            res += instr.label;
         }
 
 
-        if(instr.kind === 'singleInstr'){
+        if (instr.kind === 'singleInstr') {
             res += instr.cmd;
             res += '    ';
-            res += instr.register; 
+
+            if (instr.memory) {
+                // адрес в том виде, в котором его написал пользователь
+                res += `${instr.memory.system}[${instr.index ?? instr.memory.address}]`;
+            }
+            else {
+                res += instr.register;
+            }
         }
+
+        if (instr.kind === 'int') {
+            res += 'int';
+            res += ' ';
+            res += instr.value;
+        }
+
+        if (instr.kind === 'ret') {
+            res += "ret";
+        }
+
         //console.log(res)
         return res;
 
